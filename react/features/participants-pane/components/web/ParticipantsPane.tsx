@@ -30,7 +30,7 @@ import VisitorsList from './VisitorsList';
 
 import GaugeChart from 'react-gauge-chart';
 import ProgressBar from '@ramonak/react-progress-bar';
-//import DataBaseForGauge from '../gaugemeter/DataBaseForGauge';
+import DataBaseForGauge from '../gaugemeter/DataBaseForGauge';
 
 const useStyles = makeStyles()(theme => {
     return {
@@ -174,7 +174,7 @@ const ParticipantsPane = () => {
      * Teste: Montando os dados para apresentar no GaugeChart e no ProgressBar 
      */
     
-    // DataBaseForGauge.carregarParticipantes();
+    DataBaseForGauge.carregarParticipantes();
 
     return (
         <div className = { cx('participants_pane', classes.participantsPane) }>

@@ -1,31 +1,26 @@
 
-declare const APP: any;
-
 import Participante from "./Participante";
 import {getRoomName} from "../../../base/conference/functions"
-import Logger from '@jitsi/logger';
-import { getParticipantById, isScreenShareParticipant } from '../../../../../react/features/base/participants/functions';
-import { getSortedParticipantIds, isCurrentRoomRenamable, shouldRenderInviteButton } from '../../functions';
+import {IReduxState} from "../../../app/types";
+import { REDUCER_KEY } from "../../constants";
 
 class DataBaseForGauge {
 
   static participantes: Participante[]=DataBaseForGauge.carregarParticipantes();
 
-  static carregarParticipantes(): Participante[]{
-    const logger = Logger.getLogger();
-    const state = APP.store.getState();
-    logger.log("=== Conference Room Name",getRoomName(state));
-    let sortedParticipantIds: any = getSortedParticipantIds(state);
+  static loadSortedParticipantIds() {
 
+  }
+
+  static carregarParticipantes(): Participante[]{
+    
+    //const getState = (state: IReduxState) => state[REDUCER_KEY];
+    
     // Filter out the virtual screenshare participants since we do not want them to be displayed as separate
     // participants in the participants pane.
-    sortedParticipantIds = sortedParticipantIds.filter((id: any) => {
-        const participant = getParticipantById(state, id);
-        return !isScreenShareParticipant(participant);
-    });
-    console.log(`=== sortedParticipants=== ${sortedParticipantIds}`);
-    return [new Participante("Aula 1 Turma 3: Apresentação dialogada", 1, 1, "Professor", "avatar", 10, 3006, 3600),
-    ];
+    
+    
+    return [new Participante("Aula 1 Turma 3: Apresentação dialogada", 1, 1, "Professor", "avatar", 10, 3006, 3600),];
   }
 
   async percorrerParticipantes(): Promise<void> {

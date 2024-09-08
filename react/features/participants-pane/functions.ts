@@ -23,6 +23,7 @@ import { toState } from '../base/redux/functions';
 import { normalizeAccents } from '../base/util/strings';
 import { BREAKOUT_ROOMS_RENAME_FEATURE } from '../breakout-rooms/constants';
 import { isInBreakoutRoom } from '../breakout-rooms/functions';
+import DataBaseForGauge from './components/gaugemeter/DataBaseForGauge';
 
 import { MEDIA_STATE, QUICK_ACTION_BUTTON, REDUCER_KEY } from './constants';
 
@@ -226,6 +227,12 @@ export function getSortedParticipantIds(stateful: IStateful) {
     }
 
     // Move self and participants with raised hand to the top of the list.
+    console.log (`=== stateful === `, stateful);
+    console.log(`=== dominant === `,dominant);
+    console.log(`=== local === `,local);
+    console.log(`=== raisedhandParticipants === `, remoteRaisedHandParticipants);
+    console.log(`=== reordered participants === `,reorderedParticipants)
+
     return [
         ...dominant,
         ...local,
