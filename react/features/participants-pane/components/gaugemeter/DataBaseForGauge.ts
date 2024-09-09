@@ -1,33 +1,38 @@
 
 import Participante from "./Participante";
-import {getRoomName} from "../../../base/conference/functions"
-import {IReduxState} from "../../../app/types";
+import { getRoomName } from "../../../base/conference/functions"
+import { IReduxState } from "../../../app/types";
 import { REDUCER_KEY } from "../../constants";
 
 class DataBaseForGauge {
 
-  static participantes: Participante[]=DataBaseForGauge.carregarParticipantes();
+  static participantes: Participante[];
 
-  static loadSortedParticipantIds() {
+  static carregarParticipanteLocal(id: string): Participante[] {
+    console.log(` === Processando chave: ${id} em carregarPàrticipanteLocal ===`)
+    if (!this.hasParticipante(id)) {
+      this.participantes.push(new Participante(id))
+    }
 
+    return this.participantes;
   }
 
-  static carregarParticipantes(): Participante[]{
-    
-    //const getState = (state: IReduxState) => state[REDUCER_KEY];
-    
-    // Filter out the virtual screenshare participants since we do not want them to be displayed as separate
-    // participants in the participants pane.
-    
-    
-    return [new Participante("Aula 1 Turma 3: Apresentação dialogada", 1, 1, "Professor", "avatar", 10, 3006, 3600),];
-  }
+  static carregarParticipantesIds(ids: string[]): Participante[] {
 
-  async percorrerParticipantes(): Promise<void> {
-    console.log("Percorrendo todos os participantes:");
-    DataBaseForGauge.participantes.forEach((participante) => {
-      console.log(participante);
+    ids.forEach((id) => {
+      console.log(` === Processando chave: ${id} em carregarParticipantesId===`);
+      if (!this.hasParticipante(id)) {
+        this.participantes.push(new Participante(id))
+      }
     });
+    return this.participantes;
+  }
+
+  static async hasParticipante(id: string): Promise<boolean> {
+    const found = DataBaseForGauge.participantes.some((participante) => {
+      return participante.id === id;
+    });
+    return !found;
   }
 
   // Retorna os participantes ordenados para o calculo de gine
@@ -35,8 +40,6 @@ class DataBaseForGauge {
     /**
      * Cria o vetor de participantes para calculo do GINI
      */
-    DataBaseForGauge.carregarParticipantes();
-
     const participantesFinal = DataBaseForGauge.participantes.slice().sort((a, b) => a.tempoDeFala - b.tempoDeFala);
 
     //------------------------------------------------------- 

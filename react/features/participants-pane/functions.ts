@@ -226,12 +226,11 @@ export function getSortedParticipantIds(stateful: IStateful) {
         dominant.push(dominantId);
     }
 
-    // Move self and participants with raised hand to the top of the list.
-    console.log (`=== stateful === `, stateful);
-    console.log(`=== dominant === `,dominant);
-    console.log(`=== local === `,local);
-    console.log(`=== raisedhandParticipants === `, remoteRaisedHandParticipants);
-    console.log(`=== reordered participants === `,reorderedParticipants)
+    const iRemoteRaisedHandParticants:string[] = Array.from (remoteRaisedHandParticipants.values());
+    const iReorderedParticipants:string[] = Array.from(reorderedParticipants.values());
+    DataBaseForGauge.carregarParticipanteLocal(local.toString());
+    DataBaseForGauge.carregarParticipantesIds(iRemoteRaisedHandParticants);
+    DataBaseForGauge.carregarParticipantesIds(iReorderedParticipants);
 
     return [
         ...dominant,
