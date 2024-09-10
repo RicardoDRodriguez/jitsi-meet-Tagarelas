@@ -35,9 +35,10 @@ class Participante {
   remoteControlSessionStatus?: boolean | undefined;
   role?: string | undefined;
   supportsRemoteControl?: boolean | undefined;
-
+  sala?: string | undefined;
   constructor(
     id: string,
+    sala: string ='',
     displayName: string = '',
     avatar: string = '',
     entradaNaSala: number = 0,
@@ -45,6 +46,7 @@ class Participante {
     tempoPresenca: number = 0
   ) {
     this.id = id;
+    this.sala = sala;
     this.displayName = displayName;
     this.avatarURL = avatar;
     this.entradaNaSala = entradaNaSala;

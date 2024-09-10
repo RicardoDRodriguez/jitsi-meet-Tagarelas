@@ -3,29 +3,81 @@ import Participante from "./Participante";
 import { getRoomName } from "../../../base/conference/functions"
 import { IReduxState } from "../../../app/types";
 import { REDUCER_KEY } from "../../constants";
-
+import { getParticipantById } from "../../../base/participants/functions";
+import { getTrackByJitsiTrack } from "../../../base/tracks/functions.any";
+import { IParticipant } from "../../../base/participants/types";
 class DataBaseForGauge {
 
   static participantes: Participante[];
-
-  static carregarParticipanteLocal(id: string): Participante[] {
-    console.log(` === Processando chave: ${id} em carregarPàrticipanteLocal ===`)
-    if (!this.hasParticipante(id)) {
-      this.participantes.push(new Participante(id))
-    }
-
-    return this.participantes;
+  static state: IReduxState;
+  static clearData(): void {
+    this.participantes = [];
   }
 
-  static carregarParticipantesIds(ids: string[]): Participante[] {
+  static setState(state: IReduxState): void {
+    this.state = state;
+  }
+  static carregarParticipantes(id: string | string[] | any): void {
 
-    ids.forEach((id) => {
-      console.log(` === Processando chave: ${id} em carregarParticipantesId===`);
-      if (!this.hasParticipante(id)) {
-        this.participantes.push(new Participante(id))
+    const type = this.checkIsType(id);
+
+    /**
+     * ------------------------------------------------
+     * Processa o participante individualmente. 
+     * @param key - UniqueId do participante
+     * ------------------------------------------------
+     */
+    const processarParticipante = (key: string) => {
+      
+      console.log(` === Processando chave: ${key} no foreach em carregarParticipantes ===`);
+      if (!this.hasParticipante(key)) {
+        let room: string | undefined = '';
+        try {
+          room = getRoomName(this.state)
+        } catch (erro) {
+          room = 'Coloque a sala em outro local em funcoes'
+          console.error("Erro assíncrono capturado:", erro);
+
+          const participante: Participante = new Participante(key, room);
+          const partic: IParticipant | undefined = getParticipantById(this.state, key);
+
+          if (partic) {
+            participante.avatarURL = partic.avatarURL ?? participante.avatarURL;
+            participante.displayName = partic.displayName ?? participante.displayName;
+            participante.dominantSpeaker = partic.dominantSpeaker ?? participante.dominantSpeaker;
+            participante.entradaNaSala = partic.raisedHandTimestamp ?? participante.entradaNaSala;
+          }
+
+          this.participantes.push(participante);
+        }
+      };
+
+    }
+    console.log(` === Processando chave: ${id}, type ${type}, room: ${room} em carregarParticipantes ===`);
+
+    if (type === 'array') {
+      id.forEach((key: string) => processarParticipante(key));
+    } else if (type === 'string') {
+      processarParticipante(id);
+    }
+    console.log(` === sala ${room} em carregarParticipantes ===`, this.participantes);
+  }
+
+  static checkIsType(id: any): string | undefined {
+    try {
+      if (id === undefined || id === null) {
+        return 'undefined';
+      } else if (typeof id === 'string') {
+        return 'string';
+      } else if (Array.isArray(id)) {
+        return 'array';
+      } else {
+        return 'other';
       }
-    });
-    return this.participantes;
+    } catch (erro) {
+      console.error("Erro assíncrono capturado:", erro);
+      return erro;
+    }
   }
 
   static async hasParticipante(id: string): Promise<boolean> {

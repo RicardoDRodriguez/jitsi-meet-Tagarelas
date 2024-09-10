@@ -23,9 +23,11 @@ import { toState } from '../base/redux/functions';
 import { normalizeAccents } from '../base/util/strings';
 import { BREAKOUT_ROOMS_RENAME_FEATURE } from '../breakout-rooms/constants';
 import { isInBreakoutRoom } from '../breakout-rooms/functions';
-import DataBaseForGauge from './components/gaugemeter/DataBaseForGauge';
 
 import { MEDIA_STATE, QUICK_ACTION_BUTTON, REDUCER_KEY } from './constants';
+
+import DataBaseForGauge from "./components/gaugemeter/DataBaseForGauge";
+
 
 /**
  * Checks if a participant is force muted.
@@ -153,6 +155,12 @@ export function getQuickActionButtonType(
     const isVideoForceMuted = isForceMuted(participant, MEDIA_TYPE.VIDEO, state);
     const isParticipantSilent = participant?.isSilent || false;
 
+    /**
+     * Set state for database
+     */
+    
+    DataBaseForGauge.setState(state);
+
     if (isLocalParticipantModerator(state)) {
         if (!isAudioMuted && !isParticipantSilent) {
             return QUICK_ACTION_BUTTON.MUTE;
@@ -181,7 +189,7 @@ export const shouldRenderInviteButton = (state: IReduxState) => {
     const { disableInviteFunctions } = toState(state)['features/base/config'];
     const flagEnabled = getFeatureFlag(state, INVITE_ENABLED, true);
     const inBreakoutRoom = isInBreakoutRoom(state);
-
+    
     return flagEnabled && !disableInviteFunctions && !inBreakoutRoom;
 };
 
@@ -226,11 +234,17 @@ export function getSortedParticipantIds(stateful: IStateful) {
         dominant.push(dominantId);
     }
 
-    const iRemoteRaisedHandParticants:string[] = Array.from (remoteRaisedHandParticipants.values());
-    const iReorderedParticipants:string[] = Array.from(reorderedParticipants.values());
-    DataBaseForGauge.carregarParticipanteLocal(local.toString());
-    DataBaseForGauge.carregarParticipantesIds(iRemoteRaisedHandParticants);
-    DataBaseForGauge.carregarParticipantesIds(iReorderedParticipants);
+    const iRemoteRaisedHandParticants:string[] = Array.from (remoteRaisedHandParticipants.keys());
+    const iReorderedParticipants:string[] = Array.from(reorderedParticipants.keys());
+    
+    // console.log(`=== 1. Limpando os dados de DataBaseForGauge`)
+    // DataBaseForGauge.clearData();
+    console.log(`=== 2. carregando a variavel local`, local)
+    DataBaseForGauge.carregarParticipantes(local);
+    console.log(`=== 3. carregando a variavel remoteRaisedHandParticipants`, iRemoteRaisedHandParticants)
+    DataBaseForGauge.carregarParticipantes(iRemoteRaisedHandParticants);
+    console.log(`=== 4. carregando a variavel iReorderedParticipants`, iReorderedParticipants)
+    DataBaseForGauge.carregarParticipantes(iReorderedParticipants,);
 
     return [
         ...dominant,
