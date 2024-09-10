@@ -27,11 +27,12 @@ class DataBaseForGauge {
      * @param key - UniqueId do participante
      * ------------------------------------------------
      */
+    let room: string | undefined = '';
+
     const processarParticipante = (key: string) => {
       
       console.log(` === Processando chave: ${key} no foreach em carregarParticipantes ===`);
       if (!this.hasParticipante(key)) {
-        let room: string | undefined = '';
         try {
           room = getRoomName(this.state)
         } catch (erro) {
@@ -55,11 +56,17 @@ class DataBaseForGauge {
     }
     console.log(` === Processando chave: ${id}, type ${type}, room: ${room} em carregarParticipantes ===`);
 
+    /**
+     * Se o tipo de participants do sitema jitsi for um array ou um String
+     */
     if (type === 'array') {
       id.forEach((key: string) => processarParticipante(key));
     } else if (type === 'string') {
       processarParticipante(id);
     }
+    /**
+     * Checar se no final conseguimos alimentar participantes.
+     */
     console.log(` === sala ${room} em carregarParticipantes ===`, this.participantes);
   }
 
@@ -81,7 +88,7 @@ class DataBaseForGauge {
   }
 
   static async hasParticipante(id: string): Promise<boolean> {
-    const found = DataBaseForGauge.participantes.some((participante) => {
+    const found = this.participantes.some((participante) => {
       return participante.id === id;
     });
     return !found;
