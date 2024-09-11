@@ -159,7 +159,7 @@ export function getQuickActionButtonType(
      * Set state for database
      */
     
-    DataBaseForGauge.setState(state);
+    DataBaseForGauge.setStateAndConference(state, getCurrentConference(state));
 
     if (isLocalParticipantModerator(state)) {
         if (!isAudioMuted && !isParticipantSilent) {
@@ -238,7 +238,7 @@ export function getSortedParticipantIds(stateful: IStateful) {
     const iReorderedParticipants:string[] = Array.from(reorderedParticipants.keys());
     
     // console.log(`=== 1. Limpando os dados de DataBaseForGauge`)
-    // DataBaseForGauge.clearData();
+   // DataBaseForGauge.clearData();
     console.log(`=== 2. carregando a variavel local`, local)
     DataBaseForGauge.carregarParticipantes(local);
     console.log(`=== 3. carregando a variavel remoteRaisedHandParticipants`, iRemoteRaisedHandParticants)

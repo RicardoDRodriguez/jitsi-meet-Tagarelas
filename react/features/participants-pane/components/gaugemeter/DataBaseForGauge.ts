@@ -6,70 +6,38 @@ import { REDUCER_KEY } from "../../constants";
 import { getParticipantById } from "../../../base/participants/functions";
 import { getTrackByJitsiTrack } from "../../../base/tracks/functions.any";
 import { IParticipant } from "../../../base/participants/types";
+import conference from "../../../../../conference";
 class DataBaseForGauge {
 
-  static participantes: Participante[];
+  static participantes: Participante[] = [];
   static state: IReduxState;
+  static room: String = '';
+  static conference: any;
+  /**
+   * Limpa os dados do banco de dados
+   */
   static clearData(): void {
     this.participantes = [];
   }
-
-  static setState(state: IReduxState): void {
+  /**
+   * Carrega o estado do programa chamador
+   * @param state tipo IReduxState
+   * @param conference tipo conference
+   */
+  static setStateAndConference(state: IReduxState, conference: any): void {
     this.state = state;
-  }
-  static carregarParticipantes(id: string | string[] | any): void {
-
-    const type = this.checkIsType(id);
-
-    /**
-     * ------------------------------------------------
-     * Processa o participante individualmente. 
-     * @param key - UniqueId do participante
-     * ------------------------------------------------
-     */
-    let room: string | undefined = '';
-
-    const processarParticipante = (key: string) => {
-      
-      console.log(` === Processando chave: ${key} no foreach em carregarParticipantes ===`);
-      if (!this.hasParticipante(key)) {
-        try {
-          room = getRoomName(this.state)
-        } catch (erro) {
-          room = 'Coloque a sala em outro local em funcoes'
-          console.error("Erro assíncrono capturado:", erro);
-
-          const participante: Participante = new Participante(key, room);
-          const partic: IParticipant | undefined = getParticipantById(this.state, key);
-
-          if (partic) {
-            participante.avatarURL = partic.avatarURL ?? participante.avatarURL;
-            participante.displayName = partic.displayName ?? participante.displayName;
-            participante.dominantSpeaker = partic.dominantSpeaker ?? participante.dominantSpeaker;
-            participante.entradaNaSala = partic.raisedHandTimestamp ?? participante.entradaNaSala;
-          }
-
-          this.participantes.push(participante);
-        }
-      };
-
-    }
-    console.log(` === Processando chave: ${id}, type ${type}, room: ${room} em carregarParticipantes ===`);
-
-    /**
-     * Se o tipo de participants do sitema jitsi for um array ou um String
-     */
-    if (type === 'array') {
-      id.forEach((key: string) => processarParticipante(key));
-    } else if (type === 'string') {
-      processarParticipante(id);
-    }
-    /**
-     * Checar se no final conseguimos alimentar participantes.
-     */
-    console.log(` === sala ${room} em carregarParticipantes ===`, this.participantes);
+    this.conference = conference;
   }
 
+
+
+  /**
+   * Determina a forma pela qual os ids de quem faz parte da 
+   * videoconferência são recebidos: Normalmente Array ou Strung
+   * 
+   * @param id - GUID do participante
+   * @returns O tipo da variável
+   */
   static checkIsType(id: any): string | undefined {
     try {
       if (id === undefined || id === null) {
@@ -87,12 +55,133 @@ class DataBaseForGauge {
     }
   }
 
-  static async hasParticipante(id: string): Promise<boolean> {
-    const found = this.participantes.some((participante) => {
-      return participante.id === id;
-    });
-    return !found;
+  /**
+  * Verifica se o participante já se encontra na lista de participantes
+  * 
+  * @param id identificador do participante
+  * @returns found or nor found
+  */
+  static hasParticipante(id: string): boolean {
+
+    let found: boolean = true;
+
+    /**
+     * Se não existirem participantes no vetor retorna ! found
+     */
+    if (this.participantes.length === 0) {
+      return !found;
+    }
+
+    try {
+      const found = this.participantes.some((participante) => {
+        return participante.id === id;
+      });
+    } catch (erro) {
+      console.log(`Ocorreu o erro de verificar se existe o participante ${erro}`)
+    } finally {
+      return found;
+    }
+
   }
+
+  static carregarEstatisticasParticipante(key: string): void {
+    conference.getSpeakerStats();
+
+  }
+
+
+
+  /**
+   * 
+   * @param key Insere o objeto participant no componente participante
+   * @returns void
+   */
+  static processarParticipante(key: string, room: string): void {
+
+    console.log(` === Processando chave: ${key} no foreach em carregarParticipantes ===`);
+    if (!this.hasParticipante(key)) {
+      console.log(` === Chave não encontrada: ${key} no foreach em carregarParticipantes ===`);
+      /**
+       * Constroi o array de participante
+       */
+      const participante: Participante = new Participante(key, room);
+      const partic: IParticipant | undefined = getParticipantById(this.state, key);
+      if (partic) {
+        const speakerStats = this.conference.getSpeakerStats();
+
+        for (const userId in speakerStats) {
+          if (userId === key){
+            console.log(`=== encontrei em SpeakerStats ${key}: `, speakerStats );
+            const stats = speakerStats[userId];
+            participante.tempoDeFala = stats.totalDominantSpeakerTime ?? participante.tempoDeFala;     
+            break; // Encontrei e sai fora.
+          }
+        }
+
+        participante.avatarURL = partic.avatarURL ?? participante.avatarURL;
+        participante.displayName = partic.displayName ?? participante.displayName;
+        participante.dominantSpeaker = partic.dominantSpeaker ?? participante.dominantSpeaker;
+        participante.entradaNaSala = partic.raisedHandTimestamp ?? participante.entradaNaSala;
+
+        this.participantes.push(participante);
+
+      };
+    }
+    return
+  }
+
+
+  /**
+   * Carrega a lista de participantes para ser processada por GaugeMeter
+   * @param id lista de participants
+   * 
+   */
+  static carregarParticipantes(id: string | string[] | any): void {
+
+    // Verifica o tipo da variavel
+    const type = this.checkIsType(id);
+    console.log(` === Processando chave:`, id);
+    console.log(` === Processando type:`, type);
+
+    // Carrega o nome da sala
+    let room: String | undefined = '';
+    try {
+      room = getRoomName(this.state) ?? room;
+    } catch (erro) {
+      room = 'Coloque a sala em outro local em funcoes'
+      console.error(" === Erro assíncrono capturado:", erro);
+    }
+
+
+    try {
+      /**
+       * Se o tipo de participants do sitema jitsi for um array ou um String
+       */
+      if (type === 'array') {
+        /**
+         * Não processa nada se não houver lista
+         */
+        if (id.length == 0) {
+          console.log(` === sala ${room} Lista de ids vazia ===`);
+          return
+        }
+
+        id.forEach((key: string) => this.processarParticipante(key, room?.toString()));
+      } else if (type === 'string') {
+        this.processarParticipante(id, room?.toString());
+      }
+      /**
+       * Checar se no final conseguimos alimentar participantes.
+       */
+      console.log(` === Resultado Final => sala ${room} em carregarParticipantes ===`, this.participantes);
+    } catch (erro) {
+      console.log(` === Tentativa de processar lista de participantes acarretou em erro ${erro} ===`);
+    }
+    return
+  }
+
+
+
 
   // Retorna os participantes ordenados para o calculo de gine
   async getParticipantes(): Promise<Participante[]> {
