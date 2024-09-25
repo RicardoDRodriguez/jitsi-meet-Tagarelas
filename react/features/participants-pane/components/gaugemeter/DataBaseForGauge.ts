@@ -84,13 +84,6 @@ class DataBaseForGauge {
 
   }
 
-  static carregarEstatisticasParticipante(key: string): void {
-    conference.getSpeakerStats();
-
-  }
-
-
-
   /**
    * 
    * @param key Insere o objeto participant no componente participante
