@@ -28,8 +28,11 @@ import LobbyParticipants from './LobbyParticipants';
 import MeetingParticipants from './MeetingParticipants';
 import VisitorsList from './VisitorsList';
 
-import GaugeChart from 'react-gauge-chart';
-import ProgressBar from '@ramonak/react-progress-bar';
+/**
+ * Pacotes do Participometro
+ */
+import LiveGaugeChart from '../gaugemeter/LiveGaugeChart';
+import AvatarProgress from '../gaugemeter/AvatarProgress';
 import DataBaseForGauge from '../gaugemeter/DataBaseForGauge';
 
 const useStyles = makeStyles()(theme => {
@@ -171,11 +174,9 @@ const ParticipantsPane = () => {
     }
 
     /**
-     * Teste: Montando os dados para apresentar no GaugeChart e no ProgressBar 
+     * GaugeChart e do ProgressBar 
      */
-    
-    DataBaseForGauge.carregarParticipantes();
-
+   
     return (
         <div className = { cx('participants_pane', classes.participantsPane) }>
             <div className = { classes.header }>
@@ -185,16 +186,25 @@ const ParticipantsPane = () => {
                     onClick = { onClosePane } />
             </div>
 
-            <div>
-                    Meu Gauge Chart
-                    <GaugeChart id="gauge-chart1" percent={0.65} />
-            </div>
-            <div>
-                Teste para Minha Barra de Progresso
-                <ProgressBar completed={60} />
-            </div>
-
             <div className = { classes.container }>
+                <br className = { classes.antiCollapse } />
+                <LiveGaugeChart />
+                
+                <p className = { classes.antiCollapse } > &nbsp; </p>
+                <p className = { classes.antiCollapse } > &nbsp; </p>
+                <p className = { classes.antiCollapse } > &nbsp; </p>
+                <p className = { classes.antiCollapse } > &nbsp; </p>
+
+                <br className = { classes.antiCollapse } /> &nbsp;
+                <AvatarProgress />
+                
+                <p className = { classes.antiCollapse } > &nbsp; </p>
+                <p className = { classes.antiCollapse } > &nbsp; </p>
+                <p className = { classes.antiCollapse } > &nbsp; </p>
+                <p className = { classes.antiCollapse } > &nbsp; </p>
+                <p className = { classes.antiCollapse } > &nbsp; </p>
+                
+                <br className = { classes.antiCollapse } />
                 <VisitorsList />
                 <br className = { classes.antiCollapse } />
                 <LobbyParticipants />
