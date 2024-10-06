@@ -26,9 +26,6 @@ import { isInBreakoutRoom } from '../breakout-rooms/functions';
 
 import { MEDIA_STATE, QUICK_ACTION_BUTTON, REDUCER_KEY } from './constants';
 
-import DataBaseForGauge from "./components/gaugemeter/DataBaseForGauge";
-
-
 /**
  * Checks if a participant is force muted.
  *
@@ -63,7 +60,7 @@ export function isForceMuted(participant: IParticipant | undefined, mediaType: M
  * @returns {MediaState}
  */
 export function getParticipantAudioMediaState(participant: IParticipant | undefined,
-        muted: Boolean, state: IReduxState) {
+    muted: Boolean, state: IReduxState) {
     const dominantSpeaker = getDominantSpeakerParticipant(state);
 
     if (participant?.isSilent) {
@@ -114,6 +111,7 @@ export function getParticipantVideoMediaState(participant: IParticipant | undefi
  */
 const getState = (state: IReduxState) => state[REDUCER_KEY];
 
+
 /**
  * Returns the participants pane config.
  *
@@ -121,6 +119,7 @@ const getState = (state: IReduxState) => state[REDUCER_KEY];
  * {@code getState} function, or the redux state itself.
  * @returns {Object}
  */
+
 export const getParticipantsPaneConfig = (stateful: IStateful) => {
     const state = toState(stateful);
     const { participantsPane = {} } = state['features/base/config'];
@@ -154,12 +153,6 @@ export function getQuickActionButtonType(
     // handled only by moderators
     const isVideoForceMuted = isForceMuted(participant, MEDIA_TYPE.VIDEO, state);
     const isParticipantSilent = participant?.isSilent || false;
-
-    /**
-     * Set state for database
-     */
-    
-    DataBaseForGauge.setStateAndConference(state, getCurrentConference(state));
 
     if (isLocalParticipantModerator(state)) {
         if (!isAudioMuted && !isParticipantSilent) {
@@ -215,7 +208,7 @@ export function getSortedParticipantIds(stateful: IStateful) {
     const raisedHandParticipants = getRaiseHandsQueue(stateful).map(({ id: particId }) => particId);
     const remoteRaisedHandParticipants = new Set(raisedHandParticipants || []);
     const dominantSpeaker = getDominantSpeakerParticipant(stateful);
-
+    
     for (const participant of remoteRaisedHandParticipants.keys()) {
         // Avoid duplicates.
         if (reorderedParticipants.has(participant)) {
@@ -236,15 +229,7 @@ export function getSortedParticipantIds(stateful: IStateful) {
 
     const iRemoteRaisedHandParticants:string[] = Array.from (remoteRaisedHandParticipants.keys());
     const iReorderedParticipants:string[] = Array.from(reorderedParticipants.keys());
-    
-    // console.log(`=== 1. Limpando os dados de DataBaseForGauge`)
-   // DataBaseForGauge.clearData();
-    console.log(`=== 2. carregando a variavel local`, local)
-    DataBaseForGauge.carregarParticipantes(local);
-    console.log(`=== 3. carregando a variavel remoteRaisedHandParticipants`, iRemoteRaisedHandParticants)
-    DataBaseForGauge.carregarParticipantes(iRemoteRaisedHandParticants);
-    console.log(`=== 4. carregando a variavel iReorderedParticipants`, iReorderedParticipants)
-    DataBaseForGauge.carregarParticipantes(iReorderedParticipants,);
+      
 
     return [
         ...dominant,

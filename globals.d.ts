@@ -1,5 +1,6 @@
-import { IStore } from "./react/features/app/types";
+import { IReduxState, IStore } from "./react/features/app/types";
 import { IConfig } from "./react/features/base/config/configType";
+import Participante from "./react/features/participants-pane/components/gaugemeter/Participante";
 
 export {};
 

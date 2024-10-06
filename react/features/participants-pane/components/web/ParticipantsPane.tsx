@@ -16,7 +16,9 @@ import { isAddBreakoutRoomButtonVisible } from '../../../breakout-rooms/function
 import MuteEveryoneDialog from '../../../video-menu/components/web/MuteEveryoneDialog';
 import { close } from '../../actions.web';
 import {
+    getDatabase,
     getParticipantsPaneOpen,
+    getSortedParticipantIds,
     isMoreActionsVisible,
     isMuteAllVisible
 } from '../../functions';
@@ -34,13 +36,14 @@ import VisitorsList from './VisitorsList';
 import LiveGaugeChart from '../gaugemeter/LiveGaugeChart';
 import AvatarProgress from '../gaugemeter/AvatarProgress';
 import DataBaseForGauge from '../gaugemeter/DataBaseForGauge';
+import { Container } from '@mui/material';
 
 const useStyles = makeStyles()(theme => {
     return {
         participantsPane: {
             backgroundColor: theme.palette.ui01,
             flexShrink: 0,
-            overflow: 'hidden',
+            overflow: 'auto',
             position: 'relative',
             transition: 'width .16s ease-in-out',
             width: '315px',
@@ -92,6 +95,34 @@ const useStyles = makeStyles()(theme => {
             justifyContent: 'flex-end'
         },
 
+         headerh3:  {
+            align: 'center',
+            alignItems: 'center',
+            boxSizing: 'border-box',
+            display: 'flex',
+            // height: '30px',
+            padding: `0 ${participantsPaneTheme.panePadding}px`,
+            justifyContent: 'flex-center',
+            fontSize: '1.17em', // Tamanho de fonte padrão para <h3>
+            fontWeight: 'bold', // Peso da fonte padrão para <h3>
+            margin: '1em 0', // Margem padrão para <h3>
+            lineHeight: '1.5', // Altura da linha para melhorar a legibilidade
+        },
+        
+        headerh5: {
+            align: 'center',
+            alignItems: 'center',
+            boxSizing: 'border-box',
+            display: 'flex',
+            // height: '30px',
+            padding: `0 ${participantsPaneTheme.panePadding}px`,
+            justifyContent: 'flex-center',
+            fontSize: '0.83em', // Tamanho de fonte padrão para <h5>
+            fontWeight: 'bold', // Peso da fonte padrão para <h5>
+            margin: '1.67em 0', // Margem padrão para <h5>
+            lineHeight: '1.5', // Altura da linha para melhorar a legibilidade
+        },
+
         antiCollapse: {
             fontSize: 0,
 
@@ -125,6 +156,7 @@ const ParticipantsPane = () => {
     const paneOpen = useSelector(getParticipantsPaneOpen);
     const isBreakoutRoomsSupported = useSelector((state: IReduxState) => state['features/base/conference'])
         .conference?.getBreakoutRooms()?.isSupported();
+
     const showAddRoomButton = useSelector(isAddBreakoutRoomButtonVisible);
     const showFooter = useSelector(isLocalParticipantModerator);
     const showMuteAllButton = useSelector(isMuteAllVisible);
@@ -134,7 +166,8 @@ const ParticipantsPane = () => {
 
     const [ contextOpen, setContextOpen ] = useState(false);
     const [ searchString, setSearchString ] = useState('');
-
+    
+    
     const onWindowClickListener = useCallback((e: any) => {
         if (contextOpen && !findAncestorByClass(e.target, classes.footerMoreContainer)) {
             setContextOpen(false);
@@ -176,72 +209,37 @@ const ParticipantsPane = () => {
     /**
      * GaugeChart e do ProgressBar 
      */
-   
+    const database = new DataBaseForGauge();
     return (
         <div className = { cx('participants_pane', classes.participantsPane) }>
+        
             <div className = { classes.header }>
                 <ClickableIcon
                     accessibilityLabel = { t('participantsPane.close', 'Close') }
                     icon = { IconCloseLarge }
                     onClick = { onClosePane } />
             </div>
+            
+            <div className = { classes.headerh3 }>
+                Participômetro
+            </div>
+            
+            <div className = { classes.headerh5 }>    
+                (Distribuição dos Tempos de Fala)
+            </div>
 
             <div className = { classes.container }>
                 <br className = { classes.antiCollapse } />
-                <LiveGaugeChart />
-                
-                <p className = { classes.antiCollapse } > &nbsp; </p>
-                <p className = { classes.antiCollapse } > &nbsp; </p>
-                <p className = { classes.antiCollapse } > &nbsp; </p>
-                <p className = { classes.antiCollapse } > &nbsp; </p>
-
-                <br className = { classes.antiCollapse } /> &nbsp;
-                <AvatarProgress />
-                
-                <p className = { classes.antiCollapse } > &nbsp; </p>
-                <p className = { classes.antiCollapse } > &nbsp; </p>
-                <p className = { classes.antiCollapse } > &nbsp; </p>
-                <p className = { classes.antiCollapse } > &nbsp; </p>
-                <p className = { classes.antiCollapse } > &nbsp; </p>
-                
+                <LiveGaugeChart database={database} />
+            </div>    
+            
+            <div className = { classes.container }>
                 <br className = { classes.antiCollapse } />
-                <VisitorsList />
-                <br className = { classes.antiCollapse } />
-                <LobbyParticipants />
-                <br className = { classes.antiCollapse } />
-                <MeetingParticipants
-                    searchString = { searchString }
-                    setSearchString = { setSearchString } />
-                {isBreakoutRoomsSupported && <RoomList searchString = { searchString } />}
-                {showAddRoomButton && <AddBreakoutRoomButton />}
+                <AvatarProgress  database={database} />
             </div>
-
-            {showFooter && (
-                <div className = { classes.footer }>
-                    {showMuteAllButton && (
-                        <Button
-                            accessibilityLabel = { t('participantsPane.actions.muteAll') }
-                            labelKey = { 'participantsPane.actions.muteAll' }
-                            onClick = { onMuteAll }
-                            type = { BUTTON_TYPES.SECONDARY } />
-                    )}
-                    {showMoreActionsButton && (
-                        <div className = { classes.footerMoreContainer }>
-                            <Button
-                                accessibilityLabel = { t('participantsPane.actions.moreModerationActions') }
-                                icon = { IconDotsHorizontal }
-                                id = 'participants-pane-context-menu'
-                                onClick = { onToggleContext }
-                                type = { BUTTON_TYPES.SECONDARY } />
-                            <FooterContextMenu
-                                isOpen = { contextOpen }
-                                onDrawerClose = { onDrawerClose }
-                                onMouseLeave = { onToggleContext } />
-                        </div>
-                    )}
-                </div>
-            )}
+        
         </div>
+
     );
 };
 

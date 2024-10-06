@@ -36,6 +36,7 @@ class Participante {
   role?: string | undefined;
   supportsRemoteControl?: boolean | undefined;
   sala?: string | undefined;
+  
   constructor(
     id: string,
     sala: string ='',

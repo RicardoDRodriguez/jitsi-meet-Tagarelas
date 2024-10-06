@@ -5,7 +5,10 @@ import DataBaseForGauge from './DataBaseForGauge';
 
 const database = new DataBaseForGauge();
 
-const AvatarProgress: React.FC = () => {
+interface AvatarProgressChartProps {
+  database: DataBaseForGauge;
+}
+const AvatarProgress: React.FC<AvatarProgressChartProps> = ({ database }) => {
   const [participantsProgress, setParticipantsProgress] = useState<Participant[]>([]);
 
   useEffect(() => {
@@ -38,7 +41,7 @@ const AvatarProgress: React.FC = () => {
             completed={participant.percentualAcumuloFala.toFixed(1)}
             customLabel={`${participant.percentualAcumuloFala.toFixed(1)}%`}
             labelAlignment="outside"
-            labelColor="black"
+            labelColor="white"
             bgColor="#ef6c00"
           />
         </div>
