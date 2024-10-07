@@ -98,29 +98,73 @@ const useStyles = makeStyles()(theme => {
          headerh3:  {
             align: 'center',
             alignItems: 'center',
-            boxSizing: 'border-box',
+            boxSizing: 'content-box',
             display: 'flex',
-            // height: '30px',
+            height: '20px',
             padding: `0 ${participantsPaneTheme.panePadding}px`,
-            justifyContent: 'flex-center',
-            fontSize: '1.17em', // Tamanho de fonte padrão para <h3>
+            justifyContent: 'center', // Corrigido para 'center' ao invés de 'flex-center'
+            fontSize: '2.17em', // Tamanho de fonte padrão para <h3>
             fontWeight: 'bold', // Peso da fonte padrão para <h3>
-            margin: '1em 0', // Margem padrão para <h3>
-            lineHeight: '1.5', // Altura da linha para melhorar a legibilidade
+            margin: '0px 0px 0px 0px', // Margem padrão para <h3>
+            lineHeight: '0.0', // Altura da linha para melhorar a legibilidade
+            textAlign: 'center', // Centraliza o texto
+            width: '100%', // Garante que o elemento ocupe toda a largura disponível
         },
         
         headerh5: {
             align: 'center',
             alignItems: 'center',
-            boxSizing: 'border-box',
+            boxSizing: 'content-box',
             display: 'flex',
-            // height: '30px',
+            height: '20px',
             padding: `0 ${participantsPaneTheme.panePadding}px`,
-            justifyContent: 'flex-center',
-            fontSize: '0.83em', // Tamanho de fonte padrão para <h5>
+            justifyContent: 'center', // Corrigido para 'center' ao invés de 'flex-center'
+            fontSize: '1.30em', // Tamanho de fonte padrão para <h5>
             fontWeight: 'bold', // Peso da fonte padrão para <h5>
-            margin: '1.67em 0', // Margem padrão para <h5>
-            lineHeight: '1.5', // Altura da linha para melhorar a legibilidade
+            margin: '10px 0px 30px 0px', // Margem padrão para <h5>
+            lineHeight: '0.0', // Altura da linha para melhorar a legibilidade
+            textAlign: 'center', // Centraliza o texto
+            width: '100%', // Garante que o elemento ocupe toda a largura disponível
+        },
+
+        
+        concentrada: {
+            align: 'center',
+            position: 'relative',
+            top: '17.5%',
+            left: '24%',
+            transform: 'translate(-50%, -50%)',
+            color: '#E4080A',
+            '& span': {
+                color: '#E4080A',
+                fontWeight: 'bold'
+            }
+        },
+
+        moderada: {
+            align: 'center',
+            position: 'relative',
+            top: '10.5%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            color: '#7DDA58',
+            '& span': {
+                color: '#7DDA58',
+                fontWeight: 'bold'
+            }
+        },
+
+        equalitaria: {
+            align: 'center',
+            position: 'relatice',
+            top: '17.5%',
+            left: '76.5%',
+            transform: 'translate(-50%, -50%)',
+            color: '#5DE2E7',
+            '& span': {
+                color: '#5DE2E7',
+                fontWeight: 'bold'
+            }
         },
 
         antiCollapse: {
@@ -230,6 +274,18 @@ const ParticipantsPane = () => {
 
             <div className = { classes.container }>
                 <br className = { classes.antiCollapse } />
+                
+                <div className = { classes.concentrada}>
+                    CONCENTRADA
+                </div>
+                
+                <div className = { classes.moderada }>
+                    MODERADA
+                </div>
+                <div className= { classes.equalitaria }>
+                    IGUALITÁRIA
+                </div>    
+                    
                 <LiveGaugeChart database={database} />
             </div>    
             
