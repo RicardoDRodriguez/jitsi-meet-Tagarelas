@@ -29,7 +29,7 @@ const LiveGaugeChart: React.FC<LiveGaugeChartProps> = ({ database }) => {
       if (!Number.isNaN(newValue)) {
         console.log('=== newValue é um número ===');
       } else {
-        newValue = 0.35 ;
+        newValue = 0.0 ;
       }
      if (newValue < 0) {
         newValue = 0;
@@ -45,17 +45,6 @@ const LiveGaugeChart: React.FC<LiveGaugeChartProps> = ({ database }) => {
   }, []);
 
   return (
-    <div>
-
-      <div  style={{ position: 'absolute', top: '17.5%', left: '24%', transform: 'translate(-50%, -50%)', color: '#E4080A' }}>
-        <span style={{ color: '#E4080A' }}><b>CONCENTRADA</b></span>
-      </div>
-      <div  style={{ position: 'absolute', top: '6.5%', left: '50%', transform: 'translate(-50%, -50%)', color: '#7DDA58' }}>
-        <span><b>MODERADA</b></span>
-      </div>
-      <div style={{ position: 'absolute', top: '17.5%', left: '76.5%', transform: 'translate(-50%, -50%)', color: '#5DE2E7' }}>
-        <span><b>IGUALITÁRIA</b></span>
-      </div>
       <div>
         <GaugeChart
           id="gauge-chart1"
@@ -68,7 +57,6 @@ const LiveGaugeChart: React.FC<LiveGaugeChartProps> = ({ database }) => {
           formatTextValue={(value: number): string => `${value.toFixed(1)}%`}
         />
       </div>
-    </div>
   );
 };
 

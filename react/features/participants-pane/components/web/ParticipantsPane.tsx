@@ -79,6 +79,8 @@ const useStyles = makeStyles()(theme => {
             }
         },
 
+
+
         closeButton: {
             alignItems: 'center',
             cursor: 'pointer',
@@ -98,7 +100,7 @@ const useStyles = makeStyles()(theme => {
          headerh3:  {
             align: 'center',
             alignItems: 'center',
-            boxSizing: 'content-box',
+            boxSizing: 'border-box',
             display: 'flex',
             height: '20px',
             padding: `0 ${participantsPaneTheme.panePadding}px`,
@@ -114,7 +116,7 @@ const useStyles = makeStyles()(theme => {
         headerh5: {
             align: 'center',
             alignItems: 'center',
-            boxSizing: 'content-box',
+            boxSizing: 'border-box',
             display: 'flex',
             height: '20px',
             padding: `0 ${participantsPaneTheme.panePadding}px`,
@@ -130,8 +132,8 @@ const useStyles = makeStyles()(theme => {
         
         concentrada: {
             align: 'center',
-            position: 'relative',
-            top: '17.5%',
+            position: 'absolute',
+            top: '52.5%',
             left: '24%',
             transform: 'translate(-50%, -50%)',
             color: '#E4080A',
@@ -143,8 +145,8 @@ const useStyles = makeStyles()(theme => {
 
         moderada: {
             align: 'center',
-            position: 'relative',
-            top: '10.5%',
+            position: 'absolute',
+            top: '18.5%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
             color: '#7DDA58',
@@ -156,8 +158,8 @@ const useStyles = makeStyles()(theme => {
 
         equalitaria: {
             align: 'center',
-            position: 'relatice',
-            top: '17.5%',
+            position: 'absolute',
+            top: '52.5%',
             left: '76.5%',
             transform: 'translate(-50%, -50%)',
             color: '#5DE2E7',
@@ -176,6 +178,33 @@ const useStyles = makeStyles()(theme => {
 
             '&:first-child + *': {
                 marginTop: 0
+            }
+        },
+
+        livegaugechart: {
+            boxSizing: 'border-box',
+            flex: 1,
+            minHeight: '100vh',
+            overflowY: 'auto',
+            position: 'relative',
+            padding: `0 ${participantsPaneTheme.panePadding}px`,
+
+            '&::-webkit-scrollbar': {
+                display: 'none'
+            }
+        },
+
+
+        avatarpercent: {
+            boxSizing: 'border-box',
+            flex: 1,
+            minHeight: '100vh',
+            overflowY: 'auto',
+            position: 'relative',
+            padding: `0 ${participantsPaneTheme.panePadding}px`,
+
+            '&::-webkit-scrollbar': {
+                display: 'none'
             }
         },
 
@@ -272,7 +301,7 @@ const ParticipantsPane = () => {
                 (Distribuição dos Tempos de Fala)
             </div>
 
-            <div className = { classes.container }>
+            <div className = { classes.livegaugechart }>
                 <br className = { classes.antiCollapse } />
                 
                 <div className = { classes.concentrada}>
@@ -289,8 +318,7 @@ const ParticipantsPane = () => {
                 <LiveGaugeChart database={database} />
             </div>    
             
-            <div className = { classes.container }>
-                <br className = { classes.antiCollapse } />
+            <div className = { classes.avatarpercent }>
                 <AvatarProgress  database={database} />
             </div>
         
