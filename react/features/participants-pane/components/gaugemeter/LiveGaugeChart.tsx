@@ -54,7 +54,7 @@ const LiveGaugeChart: React.FC<LiveGaugeChartProps> = ({ database }) => {
           percent={value}
           arcPadding={0.00}
           textColor="#FFFFFF"
-          formatTextValue={(value: number): string => `${value.toFixed(1)}%`}
+          formatTextValue={(value: string): string => `${parseFloat(value).toFixed(1)}%`}
         />
       </div>
   );

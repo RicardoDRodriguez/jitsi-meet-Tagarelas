@@ -16,7 +16,6 @@ import { isAddBreakoutRoomButtonVisible } from '../../../breakout-rooms/function
 import MuteEveryoneDialog from '../../../video-menu/components/web/MuteEveryoneDialog';
 import { close } from '../../actions.web';
 import {
-    getDatabase,
     getParticipantsPaneOpen,
     getSortedParticipantIds,
     isMoreActionsVisible,

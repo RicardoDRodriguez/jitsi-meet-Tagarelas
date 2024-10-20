@@ -55,7 +55,7 @@ class DataBaseForGauge {
    * @returns String do tipo de participante.
    */
 
-  checkIsType(id: any): string | undefined {
+  checkIsType(id: any): string {
     try {
       if (id === undefined || id === null) {
         return 'undefined';
@@ -66,9 +66,9 @@ class DataBaseForGauge {
       } else {
         return 'other';
       }
-    } catch (erro) {
-      console.error("Erro assíncrono capturado:", erro);
-      return erro;
+    } catch (error) {
+      console.error("Erro assíncrono capturado:", error);
+      return "Não foi possivel definir o tipo de id";
     }
   }
 
@@ -103,7 +103,7 @@ class DataBaseForGauge {
     console.log(` === Processando type:`, type);
 
     // Carrega o nome da sala
-    let room: String | undefined = '';
+    let room: String = '';
     try {
       room = getRoomName(DataBaseForGauge.state) ?? room;
     } catch (erro) {
