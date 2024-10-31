@@ -183,7 +183,7 @@ const useStyles = makeStyles()(theme => {
         livegaugechart: {
             boxSizing: 'border-box',
             flex: 1,
-            minHeight: '130vh',
+            minHeight: '30vh',
             overflowY: 'auto',
             position: 'relative',
             padding: `0 ${participantsPaneTheme.panePadding}px`,
@@ -201,7 +201,7 @@ const useStyles = makeStyles()(theme => {
             overflowY: 'auto',
             position: 'relative',
             padding: `0 ${participantsPaneTheme.panePadding}px`,
-
+            margin: '20px',
             '&::-webkit-scrollbar': {
                 display: 'none'
             }
