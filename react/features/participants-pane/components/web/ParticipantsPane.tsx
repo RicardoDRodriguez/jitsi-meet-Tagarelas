@@ -52,7 +52,7 @@ const useStyles = makeStyles()(theme => {
             fontWeight: 600,
             height: '100%',
 
-            [[ '& > *:first-child', '& > *:last-child' ] as any]: {
+            [['& > *:first-child', '& > *:last-child'] as any]: {
                 flexShrink: 0
             },
 
@@ -96,22 +96,22 @@ const useStyles = makeStyles()(theme => {
             justifyContent: 'flex-end'
         },
 
-         headerh3:  {
+        headerh3: {
             align: 'center',
             alignItems: 'center',
             boxSizing: 'border-box',
             display: 'flex',
-            height: '20px',
+            height: '40px',
             padding: `0 ${participantsPaneTheme.panePadding}px`,
             justifyContent: 'center', // Corrigido para 'center' ao invés de 'flex-center'
             fontSize: '2.17em', // Tamanho de fonte padrão para <h3>
             fontWeight: 'bold', // Peso da fonte padrão para <h3>
             margin: '0px 0px 0px 0px', // Margem padrão para <h3>
-            lineHeight: '0.0', // Altura da linha para melhorar a legibilidade
+            lineHeight: '10.0', // Altura da linha para melhorar a legibilidade
             textAlign: 'center', // Centraliza o texto
             width: '100%', // Garante que o elemento ocupe toda a largura disponível
         },
-        
+
         headerh5: {
             align: 'center',
             alignItems: 'center',
@@ -123,16 +123,16 @@ const useStyles = makeStyles()(theme => {
             fontSize: '1.30em', // Tamanho de fonte padrão para <h5>
             fontWeight: 'bold', // Peso da fonte padrão para <h5>
             margin: '10px 0px 30px 0px', // Margem padrão para <h5>
-            lineHeight: '0.0', // Altura da linha para melhorar a legibilidade
+            lineHeight: '15.0', // Altura da linha para melhorar a legibilidade
             textAlign: 'center', // Centraliza o texto
             width: '100%', // Garante que o elemento ocupe toda a largura disponível
         },
 
-        
+
         concentrada: {
             align: 'center',
             position: 'absolute',
-            top: '52.5%',
+            top: '36%',
             left: '24%',
             transform: 'translate(-50%, -50%)',
             color: '#E4080A',
@@ -145,7 +145,7 @@ const useStyles = makeStyles()(theme => {
         moderada: {
             align: 'center',
             position: 'absolute',
-            top: '18.5%',
+            top: '25.0%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
             color: '#7DDA58',
@@ -158,7 +158,7 @@ const useStyles = makeStyles()(theme => {
         equalitaria: {
             align: 'center',
             position: 'absolute',
-            top: '52.5%',
+            top: '36%',
             left: '76.5%',
             transform: 'translate(-50%, -50%)',
             color: '#5DE2E7',
@@ -183,11 +183,11 @@ const useStyles = makeStyles()(theme => {
         livegaugechart: {
             boxSizing: 'border-box',
             flex: 1,
-            minHeight: '100vh',
+            minHeight: '130vh',
             overflowY: 'auto',
             position: 'relative',
             padding: `0 ${participantsPaneTheme.panePadding}px`,
-
+            margin: '20px',
             '&::-webkit-scrollbar': {
                 display: 'none'
             }
@@ -236,15 +236,15 @@ const ParticipantsPane = () => {
     const dispatch = useDispatch();
     const { t } = useTranslation();
 
-    const [ contextOpen, setContextOpen ] = useState(false);
-    const [ searchString, setSearchString ] = useState('');
-    
-    
+    const [contextOpen, setContextOpen] = useState(false);
+    const [searchString, setSearchString] = useState('');
+
+
     const onWindowClickListener = useCallback((e: any) => {
         if (contextOpen && !findAncestorByClass(e.target, classes.footerMoreContainer)) {
             setContextOpen(false);
         }
-    }, [ contextOpen ]);
+    }, [contextOpen]);
 
     useEffect(() => {
         window.addEventListener('click', onWindowClickListener);
@@ -283,44 +283,43 @@ const ParticipantsPane = () => {
      */
     const database = new DataBaseForGauge();
     return (
-        <div className = { cx('participants_pane', classes.participantsPane) }>
-        
-            <div className = { classes.header }>
+        <div className={cx('participants_pane', classes.participantsPane)}>
+
+            <div className={classes.header}>
                 <ClickableIcon
-                    accessibilityLabel = { t('participantsPane.close', 'Close') }
-                    icon = { IconCloseLarge }
-                    onClick = { onClosePane } />
+                    accessibilityLabel={t('participantsPane.close', 'Close')}
+                    icon={IconCloseLarge}
+                    onClick={onClosePane} />
             </div>
-            
-            <div className = { classes.headerh3 }>
+
+            <div className={classes.headerh3}>
                 Participômetro
             </div>
-            
-            <div className = { classes.headerh5 }>    
+
+            <div className={classes.headerh5}>
                 (Distribuição dos Tempos de Fala)
             </div>
 
-            <div className = { classes.livegaugechart }>
-                <br className = { classes.antiCollapse } />
-                
-                <div className = { classes.concentrada}>
-                    CONCENTRADA
-                </div>
-                
-                <div className = { classes.moderada }>
-                    MODERADA
-                </div>
-                <div className= { classes.equalitaria }>
-                    IGUALITÁRIA
-                </div>    
-                    
-                <LiveGaugeChart database={database} />
-            </div>    
-            
-            <div className = { classes.avatarpercent }>
-                <AvatarProgress  database={database} />
+            <br className={classes.antiCollapse} />
+
+            <div className={classes.concentrada}>
+                CONCENTRADA
             </div>
-        
+
+            <div className={classes.moderada}>
+                MODERADA
+            </div>
+            <div className={classes.equalitaria}>
+                IGUALITÁRIA
+            </div>
+            <div className={classes.livegaugechart}>
+                <LiveGaugeChart database={database} />
+            </div>
+
+            <div className={classes.avatarpercent}>
+                <AvatarProgress database={database} />
+            </div>
+
         </div>
 
     );
