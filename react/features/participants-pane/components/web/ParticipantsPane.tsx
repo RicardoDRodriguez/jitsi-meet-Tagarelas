@@ -132,7 +132,7 @@ const useStyles = makeStyles()(theme => {
         concentrada: {
             align: 'center',
             position: 'absolute',
-            top: '36%',
+            top: '285px',
             left: '24%',
             transform: 'translate(-50%, -50%)',
             color: '#E4080A',
@@ -145,7 +145,7 @@ const useStyles = makeStyles()(theme => {
         moderada: {
             align: 'center',
             position: 'absolute',
-            top: '25.0%',
+            top: '175px',
             left: '50%',
             transform: 'translate(-50%, -50%)',
             color: '#7DDA58',
@@ -158,7 +158,7 @@ const useStyles = makeStyles()(theme => {
         equalitaria: {
             align: 'center',
             position: 'absolute',
-            top: '36%',
+            top: '285px',
             left: '76.5%',
             transform: 'translate(-50%, -50%)',
             color: '#5DE2E7',
@@ -195,13 +195,13 @@ const useStyles = makeStyles()(theme => {
 
 
         avatarpercent: {
+            top: '310px',
             boxSizing: 'border-box',
-            flex: 1,
-            minHeight: '100vh',
+            flex: 0,
+            minHeight: '30vh',
             overflowY: 'auto',
             position: 'relative',
             padding: `0 ${participantsPaneTheme.panePadding}px`,
-            margin: '20px',
             '&::-webkit-scrollbar': {
                 display: 'none'
             }
@@ -302,19 +302,26 @@ const ParticipantsPane = () => {
 
             <br className={classes.antiCollapse} />
 
+            <div className={classes.moderada}>
+                MODERADA
+            </div>
+
+            <br className={classes.antiCollapse} />
+
+            <div className={classes.livegaugechart}>
+                <LiveGaugeChart database={database} />
+            </div>
+            
+            <br className={classes.antiCollapse} />
+
             <div className={classes.concentrada}>
                 CONCENTRADA
             </div>
 
-            <div className={classes.moderada}>
-                MODERADA
-            </div>
             <div className={classes.equalitaria}>
                 IGUALITÁRIA
             </div>
-            <div className={classes.livegaugechart}>
-                <LiveGaugeChart database={database} />
-            </div>
+
 
             <div className={classes.avatarpercent}>
                 <AvatarProgress database={database} />
