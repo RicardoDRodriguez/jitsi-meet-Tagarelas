@@ -195,12 +195,13 @@ const useStyles = makeStyles()(theme => {
 
 
         avatarpercent: {
-            top: '310px',
+            top: '330px',
+            width: '100%',
             boxSizing: 'border-box',
             flex: 0,
             minHeight: '30vh',
             overflowY: 'auto',
-            position: 'relative',
+            position: 'absolute',
             padding: `0 ${participantsPaneTheme.panePadding}px`,
             '&::-webkit-scrollbar': {
                 display: 'none'
