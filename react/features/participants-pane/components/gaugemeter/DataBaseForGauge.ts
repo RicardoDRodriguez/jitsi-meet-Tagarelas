@@ -29,13 +29,11 @@ class DataBaseForGauge {
   async loadParticipantes(): Promise<void> {
     this.setStateAndConference();
     let sortedParticipantIds: any = getSortedParticipantIds(DataBaseForGauge.state);
-    console.log(`=== 1. Limpando os dados de DataBaseForGauge e mostrando sortedParticipantIds`, sortedParticipantIds)
+
+    console.log(`=== 1. loadParticipantes --> Limpando os dados de DataBaseForGauge e mostrando sortedParticipantIds`, sortedParticipantIds)
     this.clearData();
-    //console.log(`=== 2. carregando a variavel local`, local)
-    //this.carregarParticipantes(local);
-    //console.log(`=== 3. carregando a variavel remoteRaisedHandParticipants`, iRemoteRaisedHandParticants)
-    //this.carregarParticipantes(iRemoteRaisedHandParticants);
-    console.log(`=== 4. carregando a variavel iReorderedParticipants`, sortedParticipantIds)
+
+    console.log(`=== 2. loadParticipantes --> Carregando a variavel iReorderedParticipants`, sortedParticipantIds)
     this.carregarParticipantes(sortedParticipantIds);
 
   }
@@ -72,19 +70,24 @@ class DataBaseForGauge {
     }
   }
 
+  /**
+   * 
+   * @param id chave de identificação do participante
+   * @returns True se o participante já está no DataBase // False se o participante não está no DataBase
+   */
   hasParticipante(id: string): boolean {
-    let found: boolean = true;
-
+    let found: boolean = false;
+  
     if (DataBaseForGauge.participantes.length === 0) {
-      return !found;
+      return found;
     }
-
+  
     try {
-      const found = DataBaseForGauge.participantes.some((participante) => {
+      found = DataBaseForGauge.participantes.some((participante) => {
         return participante.id === id;
       });
     } catch (erro) {
-      console.log(`Ocorreu o erro de verificar se existe o participante ${erro}`);
+      console.log(`hasParticipante -> Ocorreu o erro de verificar se existe o participante ${erro}`);
     } finally {
       return found;
     }
@@ -214,20 +217,24 @@ class DataBaseForGauge {
   }
 
   processarParticipante(key: string, room: string): void {
-    console.log(` === Processando chave: ${key} no foreach em carregarParticipantes ===`);
-    if (!this.hasParticipante(key)) {
-      console.log(` === Chave não encontrada: ${key} no foreach em carregarParticipantes ===`);
+    console.log(` === processarParticipante --> Processando chave: ${key} no foreach em processarParticipante ===`);
+    const found = this.hasParticipante(key);
+
+    if (! found) {
+      console.log(` === processarParticipante --> Novo Registro no Banco de Dados: ${key} ===`);
       const participante: Participante = new Participante(key, room);
       const partic: IParticipant | undefined = getParticipantById(DataBaseForGauge.state, key);
-      console.log(`=== Dados de partic ${key}: `, partic);
+    
+      console.log(`=== processarParticipante --> Dados de partic ${key}: `, partic);
+    
       if (partic) {
         const speakerStats = DataBaseForGauge.conference.getSpeakerStats();
 
         for (const userId in speakerStats) {
           if (userId === key) {
-            console.log(`=== encontrei em SpeakerStats ${key}: `, speakerStats);
+            console.log(` processarParticipante --> encontrei em SpeakerStats ${key}: `, speakerStats);
             const stats = speakerStats[userId];
-            console.log(`=== encontrei em stats ${key}: `, stats);
+            console.log(`processarParticipante --> encontrei em stats ${key}: `, stats);
             participante.tempoDeFala = stats.totalDominantSpeakerTime ?? participante.tempoDeFala;
             break;
           }

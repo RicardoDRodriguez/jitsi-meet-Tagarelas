@@ -145,7 +145,7 @@ const useStyles = makeStyles()(theme => {
         moderada: {
             align: 'center',
             position: 'absolute',
-            top: '175px',
+            top: '135px',
             left: '50%',
             transform: 'translate(-50%, -50%)',
             color: '#7DDA58',
@@ -183,11 +183,13 @@ const useStyles = makeStyles()(theme => {
         livegaugechart: {
             boxSizing: 'border-box',
             flex: 1,
+            top: '150px',
+            width: '100%',
             minHeight: '30vh',
             overflowY: 'auto',
-            position: 'relative',
+            position: 'absolute',
             padding: `0 ${participantsPaneTheme.panePadding}px`,
-            margin: '20px',
+            margin: '0px',
             '&::-webkit-scrollbar': {
                 display: 'none'
             }

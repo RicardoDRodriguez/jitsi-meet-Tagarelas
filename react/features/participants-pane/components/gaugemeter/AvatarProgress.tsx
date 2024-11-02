@@ -21,6 +21,7 @@ const AvatarProgress: React.FC<AvatarProgressChartProps> = ({ database }) => {
 
     const interval = setInterval(async () => {
       const participants = await database.getParticipantesPercentualAcumuloFala();
+      console.log(`=== AvatarProgress === 1.Lista de participantes para serem processados`, participants)
       setParticipantsProgress((prevParticipants) =>
         prevParticipants.map((participant) => ({
           ...participant,
