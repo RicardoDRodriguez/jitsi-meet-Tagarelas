@@ -132,7 +132,7 @@ const useStyles = makeStyles()(theme => {
         concentrada: {
             align: 'center',
             position: 'absolute',
-            top: '285px',
+            top: '270px',
             left: '24%',
             transform: 'translate(-50%, -50%)',
             color: '#E4080A',
@@ -145,7 +145,7 @@ const useStyles = makeStyles()(theme => {
         moderada: {
             align: 'center',
             position: 'absolute',
-            top: '135px',
+            top: '145px',
             left: '50%',
             transform: 'translate(-50%, -50%)',
             color: '#7DDA58',
@@ -158,7 +158,7 @@ const useStyles = makeStyles()(theme => {
         equalitaria: {
             align: 'center',
             position: 'absolute',
-            top: '285px',
+            top: '270px',
             left: '76.5%',
             transform: 'translate(-50%, -50%)',
             color: '#5DE2E7',
