@@ -6,12 +6,16 @@ import { IParticipant } from "../../../base/participants/types";
 import { getRoomName } from "../../../base/conference/functions";
 import { getSortedParticipantIds } from "../../functions";
 
+//import abstractSpeakerStatsList from "../../../speaker-stats/components/AbstractSpeakerStatsList";
+//import SpeakerStatsItem from "../../../speaker-stats/components/native/SpeakerStatsItem";
+
 class DataBaseForGauge {
 
   static participantes: Participante[] = [];
   static state: IReduxState;
   static room: string = '';
   static conference: any;
+
 
   async clearData(): Promise<void> {
     DataBaseForGauge.participantes = [];
@@ -25,26 +29,30 @@ class DataBaseForGauge {
   }
   /**
    * Carrega Participantes de functions de participants-pane
-  **/ 
+  **/
   async loadParticipantes(): Promise<void> {
-    this.setStateAndConference();
-    let sortedParticipantIds: any = getSortedParticipantIds(DataBaseForGauge.state);
-
-    console.log(`=== 1. loadParticipantes --> Limpando os dados de DataBaseForGauge e mostrando sortedParticipantIds`, sortedParticipantIds)
+    console.log(`==== 1. loadParticipantes --> Limpando os dados de DataBaseForGauge`)
     this.clearData();
 
-    console.log(`=== 2. loadParticipantes --> Carregando a variavel iReorderedParticipants`, sortedParticipantIds)
+    console.log(`==== 2. loadParticipantes --> Carregando a funcao setStateAndConference`)
+    this.setStateAndConference();
+
+    let sortedParticipantIds: any = getSortedParticipantIds(DataBaseForGauge.state);
+    console.log(`==== 3. loadParticipantes --> Carregando a variavel iReorderedParticipants`, sortedParticipantIds)
     this.carregarParticipantes(sortedParticipantIds);
+
 
   }
 
   /**
    * Carrega o estao e a conferencia
-  **/ 
+  **/
 
   async setStateAndConference(): Promise<void> {
     DataBaseForGauge.state = APP.store.getState();
     DataBaseForGauge.conference = APP.conference;
+    //console.log(`=== 1. setStateAndConference --> Carregando a variavel state`, DataBaseForGauge.state);
+    //console.log(`=== 2. setStateAndConference --> Carregando a variavel conference`, DataBaseForGauge.conference);
   }
 
   /**
@@ -77,11 +85,11 @@ class DataBaseForGauge {
    */
   hasParticipante(id: string): boolean {
     let found: boolean = false;
-  
+
     if (DataBaseForGauge.participantes.length === 0) {
       return found;
     }
-  
+
     try {
       found = DataBaseForGauge.participantes.some((participante) => {
         return participante.id === id;
@@ -102,16 +110,16 @@ class DataBaseForGauge {
 
     // Verifica o tipo da variavel
     const type = this.checkIsType(id);
-    console.log(` === Processando chave:`, id);
-    console.log(` === Processando type:`, type);
+    console.log(`==== 1. carregarParticipantes. Processando chave:`, id);
+    console.log(`==== 2. carregarParticipantes. Processando type:`, type);
 
     // Carrega o nome da sala
     let room: String = '';
     try {
       room = getRoomName(DataBaseForGauge.state) ?? room;
     } catch (erro) {
-      room = 'Não acheia a Sala'
-      console.error(" === Erro assíncrono capturado:", erro);
+      room = ' ==== Não acheia a Sala'
+      console.error(" ==== Erro assíncrono capturado:", erro);
     }
 
 
@@ -124,20 +132,26 @@ class DataBaseForGauge {
          * Não processa nada se não houver lista
          */
         if (id.length == 0) {
-          console.log(` === sala ${room} Lista de ids vazia ===`);
+          console.log(` ==== sala ${room} Lista de ids vazia ===`);
           return
         }
 
+        //==========================================
+        //Processar todos os participantes da lista
+        //==========================================
+
         id.forEach((key: string) => this.processarParticipante(key, room?.toString()));
+
       } else if (type === 'string') {
         this.processarParticipante(id, room?.toString());
       }
+
       /**
        * Checar se no final conseguimos alimentar participantes.
        */
-      console.log(` === Resultado Final => sala ${room} em carregarParticipantes ===`, DataBaseForGauge.participantes);
+      console.log(` ==== Resultado Final => sala ${room} em carregarParticipantes ===`, DataBaseForGauge.participantes);
     } catch (erro) {
-      console.log(` === Tentativa de processar lista de participantes acarretou em erro ${erro} ===`);
+      console.log(` ==== Tentativa de processar lista de participantes acarretou em erro ${erro} ===`);
     }
     return
   }
@@ -217,16 +231,16 @@ class DataBaseForGauge {
   }
 
   processarParticipante(key: string, room: string): void {
-    console.log(` === processarParticipante --> Processando chave: ${key} no foreach em processarParticipante ===`);
+    console.log(` ==== 1. processarParticipante --> Processando chave: ${key} no foreach em processarParticipante ===`);
     const found = this.hasParticipante(key);
 
-    if (! found) {
-      console.log(` === processarParticipante --> Novo Registro no Banco de Dados: ${key} ===`);
+    if (!found) {
+      console.log(` ==== 2. processarParticipante --> Novo Registro no Banco de Dados: ${key} ===`);
       const participante: Participante = new Participante(key, room);
       const partic: IParticipant | undefined = getParticipantById(DataBaseForGauge.state, key);
-    
-      console.log(`=== processarParticipante --> Dados de partic ${key}: `, partic);
-    
+
+      console.log(`==== 3. processarParticipante --> Dados de partic ${key}: `, partic);
+
       if (partic) {
         const speakerStats = DataBaseForGauge.conference.getSpeakerStats();
 
@@ -234,22 +248,28 @@ class DataBaseForGauge {
           if (userId === key) {
             console.log(` processarParticipante --> encontrei em SpeakerStats ${key}: `, speakerStats);
             const stats = speakerStats[userId];
-            console.log(`processarParticipante --> encontrei em stats ${key}: `, stats);
-            participante.tempoDeFala = stats.totalDominantSpeakerTime ?? participante.tempoDeFala;
+            this.moveStatsToParticipante(key, stats, participante);
             break;
           }
         }
-
-        participante.avatarURL = partic.avatarURL ?? participante.avatarURL;
-        participante.displayName = partic.name ?? participante.displayName;
-        participante.role = partic.role ?? participante.role;
-        participante.dominantSpeaker = partic.dominantSpeaker ?? participante.dominantSpeaker;
-        participante.entradaNaSala = partic.raisedHandTimestamp ?? participante.entradaNaSala;
-
-        DataBaseForGauge.participantes.push(participante);
       }
     }
   }
+
+  moveStatsToParticipante(key: string, stats: any, participante: Participante): void {
+    console.log(`==== 1. moveStatsToParticipante --> encontrei em stats ${key}: `, stats);
+    participante.tempoDeFala = stats.totalDominantSpeakerTime ?? participante.tempoDeFala;
+    participante.entradaNaSala = stats._dominantSpeakerStart ?? participante.entradaNaSala;
+    participante.avatarURL = stats.avatarURL ?? participante.avatarURL;
+    participante.displayName = stats.displayName ?? participante.displayName;
+    participante.role = stats.role ?? participante.role;
+    participante.dominantSpeaker = stats.dominantSpeaker ?? participante.dominantSpeaker;
+    console.log(`==== 2. moveStatsToParticipante --> participante montado ${key}: `, participante);
+    DataBaseForGauge.participantes.push(participante);
+  }
+
 }
 
 export default DataBaseForGauge;
+
+
