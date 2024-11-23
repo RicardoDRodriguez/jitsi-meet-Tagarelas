@@ -37,7 +37,7 @@ const AvatarProgress: React.FC<AvatarProgressChartProps> = ({ database }) => {
     <div>
       {participantsProgress.map((participant) => (
         <div key={participant.id}>
-          <span style={{ marginRight: '10px' }}>{participant.displayName}</span>
+          <span style={{ marginRight: '10px' }}>{participant.name}</span>
           <ProgressBar
             completed={participant.percentualAcumuloFala.toFixed(1)}
             customLabel={`${participant.percentualAcumuloFala.toFixed(1)}%`}

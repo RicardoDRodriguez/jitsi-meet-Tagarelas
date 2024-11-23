@@ -6,8 +6,6 @@ import { IParticipant } from "../../../base/participants/types";
 import { getRoomName } from "../../../base/conference/functions";
 import { getSortedParticipantIds } from "../../functions";
 
-//import abstractSpeakerStatsList from "../../../speaker-stats/components/AbstractSpeakerStatsList";
-//import SpeakerStatsItem from "../../../speaker-stats/components/native/SpeakerStatsItem";
 
 class DataBaseForGauge {
 
@@ -27,6 +25,17 @@ class DataBaseForGauge {
       console.log(participante);
     });
   }
+
+  /**
+   * Carrega o estao e a conferencia
+  **/
+
+  async setStateAndConference(): Promise<void> {
+    DataBaseForGauge.state = APP.store.getState();
+    DataBaseForGauge.conference = APP.conference;
+  }
+
+
   /**
    * Carrega Participantes de functions de participants-pane
   **/
@@ -38,22 +47,10 @@ class DataBaseForGauge {
     this.setStateAndConference();
 
     let sortedParticipantIds: any = getSortedParticipantIds(DataBaseForGauge.state);
-    console.log(`==== 3. loadParticipantes --> Carregando a variavel iReorderedParticipants`, sortedParticipantIds)
+    console.log(`==== 3. loadParticipantes --> Carregando a variavel iReorderedParticipants`, sortedParticipantIds);
     this.carregarParticipantes(sortedParticipantIds);
-
-
   }
 
-  /**
-   * Carrega o estao e a conferencia
-  **/
-
-  async setStateAndConference(): Promise<void> {
-    DataBaseForGauge.state = APP.store.getState();
-    DataBaseForGauge.conference = APP.conference;
-    //console.log(`=== 1. setStateAndConference --> Carregando a variavel state`, DataBaseForGauge.state);
-    //console.log(`=== 2. setStateAndConference --> Carregando a variavel conference`, DataBaseForGauge.conference);
-  }
 
   /**
    * checa o tipo de participante.
@@ -243,31 +240,27 @@ class DataBaseForGauge {
 
       if (partic) {
         const speakerStats = DataBaseForGauge.conference.getSpeakerStats();
-
         for (const userId in speakerStats) {
           if (userId === key) {
-            console.log(` processarParticipante --> encontrei em SpeakerStats ${key}: `, speakerStats);
+            console.log(`==== 4. processarParticipante --> encontrei em SpeakerStats ${key}: `, speakerStats);
             const stats = speakerStats[userId];
-            this.moveStatsToParticipante(key, stats, participante);
+            console.log(`==== 5. processarParticipante  --> encontrei em stats ${key}: `, stats);
+            participante.tempoDeFala = stats.totalDominantSpeakerTime ?? participante.tempoDeFala;
+            participante.entradaNaSala = stats._dominantSpeakerStart ?? participante.entradaNaSala;
+            participante.avatarURL = partic.avatarURL ?? participante.avatarURL;
+            participante.displayName = partic.displayName ?? participante.displayName;
+            participante.name = partic.name ?? participante.name;
+            participante.role = partic.role ?? participante.role;
+            participante.dominantSpeaker = partic.dominantSpeaker ?? participante.dominantSpeaker;
+            console.log(`==== 6. processarParticipante  --> participante montado ${key}: `, participante);
+            DataBaseForGauge.participantes.push(participante);
             break;
           }
         }
+
       }
     }
   }
-
-  moveStatsToParticipante(key: string, stats: any, participante: Participante): void {
-    console.log(`==== 1. moveStatsToParticipante --> encontrei em stats ${key}: `, stats);
-    participante.tempoDeFala = stats.totalDominantSpeakerTime ?? participante.tempoDeFala;
-    participante.entradaNaSala = stats._dominantSpeakerStart ?? participante.entradaNaSala;
-    participante.avatarURL = stats.avatarURL ?? participante.avatarURL;
-    participante.displayName = stats.displayName ?? participante.displayName;
-    participante.role = stats.role ?? participante.role;
-    participante.dominantSpeaker = stats.dominantSpeaker ?? participante.dominantSpeaker;
-    console.log(`==== 2. moveStatsToParticipante --> participante montado ${key}: `, participante);
-    DataBaseForGauge.participantes.push(participante);
-  }
-
 }
 
 export default DataBaseForGauge;
