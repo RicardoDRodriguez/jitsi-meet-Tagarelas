@@ -33,6 +33,14 @@ class DataBaseForGauge {
   async setStateAndConference(): Promise<void> {
     DataBaseForGauge.state = APP.store.getState();
     DataBaseForGauge.conference = APP.conference;
+
+    const speakerStats = DataBaseForGauge.conference.getSpeakerStats();
+    
+    Object.keys(speakerStats).forEach((userId) => {
+      const stats = speakerStats[userId];
+      console.log(`==== 1. setStateAndConference --> Participante: ${userId}, Tempo de Fala: ${stats.totalDominantSpeakerTime}`);
+    });
+
   }
 
 
@@ -114,6 +122,7 @@ class DataBaseForGauge {
     let room: String = '';
     try {
       room = getRoomName(DataBaseForGauge.state) ?? room;
+      
     } catch (erro) {
       room = ' ==== Não acheia a Sala'
       console.error(" ==== Erro assíncrono capturado:", erro);
