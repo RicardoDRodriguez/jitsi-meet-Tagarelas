@@ -34,11 +34,12 @@ class DataBaseForGauge {
     DataBaseForGauge.state = APP.store.getState();
     DataBaseForGauge.conference = APP.conference;
 
-    const speakerStats = DataBaseForGauge.conference.getSpeakerStats();
-    
-    Object.keys(speakerStats).forEach((userId) => {
-      const stats = speakerStats[userId];
-      console.log(`==== 1. setStateAndConference --> Participante: ${userId}, Tempo de Fala: ${stats.totalDominantSpeakerTime}`);
+    const conf = APP.conference;
+    const speakerStatistics = conf.getSpeakerStats();
+
+    Object.keys(speakerStatistics).forEach((userId) => {
+      const statistics = speakerStatistics[userId];
+      console.log(`==== 1. setStateAndConference --> Participante: ${userId}, Tempo de Fala: ${statistics.getTotalDominantSpeakerTime()}`);
     });
 
   }
@@ -122,7 +123,7 @@ class DataBaseForGauge {
     let room: String = '';
     try {
       room = getRoomName(DataBaseForGauge.state) ?? room;
-      
+
     } catch (erro) {
       room = ' ==== Não acheia a Sala'
       console.error(" ==== Erro assíncrono capturado:", erro);
@@ -164,7 +165,17 @@ class DataBaseForGauge {
 
   async getParticipantesPercentualAcumuloFala(): Promise<Participante[]> {
     this.loadParticipantes()
-    const participantesOrdenadosDescrescente = DataBaseForGauge.participantes.slice().sort((a, b) => b.tempoDeFala - a.tempoDeFala);
+    
+    const totalTempoDeFalaEmMinutos = DataBaseForGauge.participantes.reduce(
+      (total, participante) => total + Number(participante.tempoDeFala), 0
+    );
+
+    console.log(`==== 1. getParticipantes  --> total de tempo de fala ${totalTempoDeFalaEmMinutos}: `);
+    DataBaseForGauge.participantes.forEach((participante) => {
+      participante.percentualAcumuloFala = (participante.tempoDeFala / totalTempoDeFalaEmMinutos)*100;
+    });
+
+    const participantesOrdenadosDescrescente = DataBaseForGauge.participantes.slice().sort((a, b) => b.percentualAcumuloFala - a.percentualAcumuloFala);
     return participantesOrdenadosDescrescente;
   }
 
@@ -254,7 +265,7 @@ class DataBaseForGauge {
             console.log(`==== 4. processarParticipante --> encontrei em SpeakerStats ${key}: `, speakerStats);
             const stats = speakerStats[userId];
             console.log(`==== 5. processarParticipante  --> encontrei em stats ${key}: `, stats);
-            participante.tempoDeFala = stats.totalDominantSpeakerTime ?? participante.tempoDeFala;
+            participante.tempoDeFala = stats.getTotalDominantSpeakerTime() ?? participante.tempoDeFala;
             participante.entradaNaSala = stats._dominantSpeakerStart ?? participante.entradaNaSala;
             participante.avatarURL = partic.avatarURL ?? participante.avatarURL;
             participante.displayName = partic.displayName ?? participante.displayName;
@@ -266,7 +277,6 @@ class DataBaseForGauge {
             break;
           }
         }
-
       }
     }
   }
