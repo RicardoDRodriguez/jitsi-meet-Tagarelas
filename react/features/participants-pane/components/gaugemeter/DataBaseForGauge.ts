@@ -34,16 +34,58 @@ class DataBaseForGauge {
     DataBaseForGauge.state = APP.store.getState();
     DataBaseForGauge.conference = APP.conference;
 
-    const conf = APP.conference;
-    const speakerStatistics = conf.getSpeakerStats();
-
-    Object.keys(speakerStatistics).forEach((userId) => {
-      const statistics = speakerStatistics[userId];
-      console.log(`==== 1. setStateAndConference --> Participante: ${userId}, Tempo de Fala: ${statistics.getTotalDominantSpeakerTime()}`);
-    });
-
   }
 
+  /**
+    * Carrega a lista de participantes para ser processada por GaugeMeter
+    * @param id lista de participants
+    * 
+    */
+  async carregarParticipantes(id: string | string[] | any): Promise<void> {
+    // Verifica o tipo da variavel
+    const type = this.checkIsType(id);
+    console.log(`==== 1. carregarParticipantes. Processando chave:`, id);
+    console.log(`==== 2. carregarParticipantes. Processando type:`, type);
+    // Carrega o nome da sala
+    let room: String = '';
+    try {
+      room = getRoomName(DataBaseForGauge.state) ?? room;
+    } catch (erro) {
+      room = ' ==== Não acheia a Sala'
+      console.error(" ==== Erro assíncrono capturado:", erro);
+    }
+    try {
+      /**
+       * Se o tipo de participants do sitema jitsi for um array ou um String
+       */
+      if (type === 'array') {
+        /**
+         * Não processa nada se não houver lista
+         */
+        if (id.length == 0) {
+          console.log(` ==== sala ${room} Lista de ids vazia ===`);
+          return
+        }
+
+        //==========================================
+        //Processar todos os participantes da lista
+        //==========================================
+
+        id.forEach((key: string) => this.processarParticipante(key, room?.toString()));
+
+      } else if (type === 'string') {
+        this.processarParticipante(id, room?.toString());
+      }
+
+      /**
+       * Checar se no final conseguimos alimentar participantes.
+       */
+      console.log(` ==== Resultado Final => sala ${room} em carregarParticipantes ===`, DataBaseForGauge.participantes);
+    } catch (erro) {
+      console.log(` ==== Tentativa de processar lista de participantes acarretou em erro ${erro} ===`);
+    }
+    return
+  }
 
   /**
    * Carrega Participantes de functions de participants-pane
@@ -54,7 +96,7 @@ class DataBaseForGauge {
 
     console.log(`==== 2. loadParticipantes --> Carregando a funcao setStateAndConference`)
     this.setStateAndConference();
-
+    //Carrega Id de participantes de function
     let sortedParticipantIds: any = getSortedParticipantIds(DataBaseForGauge.state);
     console.log(`==== 3. loadParticipantes --> Carregando a variavel iReorderedParticipants`, sortedParticipantIds);
     this.carregarParticipantes(sortedParticipantIds);
@@ -107,72 +149,16 @@ class DataBaseForGauge {
     }
   }
 
-  /**
-   * Carrega a lista de participantes para ser processada por GaugeMeter
-   * @param id lista de participants
-   * 
-   */
-  async carregarParticipantes(id: string | string[] | any): Promise<void> {
-
-    // Verifica o tipo da variavel
-    const type = this.checkIsType(id);
-    console.log(`==== 1. carregarParticipantes. Processando chave:`, id);
-    console.log(`==== 2. carregarParticipantes. Processando type:`, type);
-
-    // Carrega o nome da sala
-    let room: String = '';
-    try {
-      room = getRoomName(DataBaseForGauge.state) ?? room;
-
-    } catch (erro) {
-      room = ' ==== Não acheia a Sala'
-      console.error(" ==== Erro assíncrono capturado:", erro);
-    }
-
-
-    try {
-      /**
-       * Se o tipo de participants do sitema jitsi for um array ou um String
-       */
-      if (type === 'array') {
-        /**
-         * Não processa nada se não houver lista
-         */
-        if (id.length == 0) {
-          console.log(` ==== sala ${room} Lista de ids vazia ===`);
-          return
-        }
-
-        //==========================================
-        //Processar todos os participantes da lista
-        //==========================================
-
-        id.forEach((key: string) => this.processarParticipante(key, room?.toString()));
-
-      } else if (type === 'string') {
-        this.processarParticipante(id, room?.toString());
-      }
-
-      /**
-       * Checar se no final conseguimos alimentar participantes.
-       */
-      console.log(` ==== Resultado Final => sala ${room} em carregarParticipantes ===`, DataBaseForGauge.participantes);
-    } catch (erro) {
-      console.log(` ==== Tentativa de processar lista de participantes acarretou em erro ${erro} ===`);
-    }
-    return
-  }
-
   async getParticipantesPercentualAcumuloFala(): Promise<Participante[]> {
     this.loadParticipantes()
-    
+
     const totalTempoDeFalaEmMinutos = DataBaseForGauge.participantes.reduce(
       (total, participante) => total + Number(participante.tempoDeFala), 0
     );
 
     console.log(`==== 1. getParticipantes  --> total de tempo de fala ${totalTempoDeFalaEmMinutos}: `);
     DataBaseForGauge.participantes.forEach((participante) => {
-      participante.percentualAcumuloFala = (participante.tempoDeFala / totalTempoDeFalaEmMinutos)*100;
+      participante.percentualAcumuloFala = (participante.tempoDeFala / totalTempoDeFalaEmMinutos) * 100;
     });
 
     const participantesOrdenadosDescrescente = DataBaseForGauge.participantes.slice().sort((a, b) => b.percentualAcumuloFala - a.percentualAcumuloFala);
@@ -183,11 +169,11 @@ class DataBaseForGauge {
   async calcularGini(): Promise<number> {
     await this.loadParticipantes();
 
-    console.log("Colecao de participantes com o calculo de Gini: ", DataBaseForGauge.participantes);
+    console.log("==== 1. calcularGini() - Colecao de participantes com o calculo de Gini: ", DataBaseForGauge.participantes);
 
     // Participantes ordenados de forma decrescente
     const participantesOrdenados = DataBaseForGauge.participantes.slice().sort((a, b) => b.tempoDeFala - a.tempoDeFala);
-    console.log("Colecao de participantes: ", participantesOrdenados);
+    console.log("==== 2. calcularGini() - Colecao de participantes: ", participantesOrdenados);
 
     /*
       Calcula a soma acumulativa dos tempos de fala dos participantes
@@ -199,8 +185,8 @@ class DataBaseForGauge {
       return soma;
     }, 0);
 
-    console.log("Soma dos tempos:", somaAcumulativaTempo);
-    console.log("Ocupantes da Sala:", ocupantesDaSala);
+    console.log("==== 3. calcularGini() - Soma dos tempos:", somaAcumulativaTempo);
+    console.log("==== 4. calcularGini() - Ocupantes da Sala:", ocupantesDaSala);
 
     /*
     Participantes ordenados de forma crescente
@@ -232,6 +218,8 @@ class DataBaseForGauge {
     Calculo final do Gini´ usando a formula do artigo
     */
     const giniIndex = (somatorioFi / (ultimoElemento ** 2));
+    console.log("==== 5. calcularGini() - resultado de giniIndex:", giniIndex);
+    
     return giniIndex;
   }
 
@@ -247,7 +235,7 @@ class DataBaseForGauge {
     return totalTempoDeFalaEmMinutos / DataBaseForGauge.participantes.length;
   }
 
-  processarParticipante(key: string, room: string): void {
+  async processarParticipante(key: string, room: string): Promise<void> {
     console.log(` ==== 1. processarParticipante --> Processando chave: ${key} no foreach em processarParticipante ===`);
     const found = this.hasParticipante(key);
 
