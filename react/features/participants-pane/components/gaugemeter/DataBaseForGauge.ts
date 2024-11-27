@@ -47,11 +47,11 @@ class DataBaseForGauge {
     console.log(`==== 1. carregarParticipantes. Processando chave:`, id);
     console.log(`==== 2. carregarParticipantes. Processando type:`, type);
     // Carrega o nome da sala
-    let room: String = '';
+    DataBaseForGauge.room = '';
     try {
-      room = getRoomName(DataBaseForGauge.state) ?? room;
+      DataBaseForGauge.room = getRoomName(DataBaseForGauge.state) ?? DataBaseForGauge.room;
     } catch (erro) {
-      room = ' ==== Não acheia a Sala'
+      DataBaseForGauge.room = ' ==== Não achei a a Sala'
       console.error(" ==== Erro assíncrono capturado:", erro);
     }
     try {
@@ -63,7 +63,7 @@ class DataBaseForGauge {
          * Não processa nada se não houver lista
          */
         if (id.length == 0) {
-          console.log(` ==== sala ${room} Lista de ids vazia ===`);
+          console.log(` ==== sala ${DataBaseForGauge.room} Lista de ids vazia ===`);
           return
         }
 
@@ -71,16 +71,16 @@ class DataBaseForGauge {
         //Processar todos os participantes da lista
         //==========================================
 
-        id.forEach((key: string) => this.processarParticipante(key, room?.toString()));
+        id.forEach((key: string) => this.processarParticipante(key, DataBaseForGauge.room));
 
       } else if (type === 'string') {
-        this.processarParticipante(id, room?.toString());
+        this.processarParticipante(id, DataBaseForGauge.room.toString());
       }
 
       /**
        * Checar se no final conseguimos alimentar participantes.
        */
-      console.log(` ==== Resultado Final => sala ${room} em carregarParticipantes ===`, DataBaseForGauge.participantes);
+      console.log(` ==== Resultado Final => sala ${DataBaseForGauge.room} em carregarParticipantes ===`, DataBaseForGauge.participantes);
     } catch (erro) {
       console.log(` ==== Tentativa de processar lista de participantes acarretou em erro ${erro} ===`);
     }
@@ -219,7 +219,7 @@ class DataBaseForGauge {
     */
     const giniIndex = (somatorioFi / (ultimoElemento ** 2));
     console.log("==== 5. calcularGini() - resultado de giniIndex:", giniIndex);
-    
+
     return giniIndex;
   }
 

@@ -284,7 +284,6 @@ const ParticipantsPane = () => {
     /**
      * GaugeChart e do ProgressBar 
      */
-    const database = new DataBaseForGauge();
     return (
         <div className={cx('participants_pane', classes.participantsPane)}>
 
@@ -312,7 +311,7 @@ const ParticipantsPane = () => {
             <br className={classes.antiCollapse} />
 
             <div className={classes.livegaugechart}>
-                <LiveGaugeChart database={database} />
+                <LiveGaugeChart />
             </div>
             
             <br className={classes.antiCollapse} />
@@ -327,7 +326,7 @@ const ParticipantsPane = () => {
 
 
             <div className={classes.avatarpercent}>
-                <AvatarProgress database={database} />
+                <AvatarProgress />
             </div>
 
         </div>

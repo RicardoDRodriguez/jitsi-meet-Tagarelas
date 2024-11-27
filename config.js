@@ -1509,7 +1509,7 @@ var config = {
     // hideConferenceSubject: false,
 
     // Hides the conference timer.
-    // hideConferenceTimer: false,
+     hideConferenceTimer: false,
 
     // Hides the recording label
     // hideRecordingLabel: false,

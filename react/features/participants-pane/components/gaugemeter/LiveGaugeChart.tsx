@@ -14,7 +14,7 @@ interface LiveGaugeChartProps {
   database: DataBaseForGauge;
 }
 
-const LiveGaugeChart: React.FC<LiveGaugeChartProps> = ({ database }) => {
+const LiveGaugeChart: React.FC<LiveGaugeChartProps> = ({  }) => {
   const [value, setValue] = useState<number>(0.0); // Initial value
 
 
@@ -22,7 +22,7 @@ const LiveGaugeChart: React.FC<LiveGaugeChartProps> = ({ database }) => {
   useEffect(() => {
     const interval = setInterval(async () => {
       let newValue = 0;
-
+      const database = new DataBaseForGauge
       newValue = await database.calcularGini();
       console.log("=== New Value: ", newValue);
 
