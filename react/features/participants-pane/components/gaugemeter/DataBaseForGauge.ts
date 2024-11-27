@@ -169,24 +169,93 @@ class DataBaseForGauge {
   async calcularGini(): Promise<number> {
     await this.loadParticipantes();
 
-    console.log("==== 1. calcularGini() - Colecao de participantes com o calculo de Gini: ", DataBaseForGauge.participantes);
+    const participantesFinal = DataBaseForGauge.participantes.slice().sort((a, b) => a.tempoDeFala - b.tempoDeFala);
+
+    //------------------------------------------------------- 
+    // COLUNA 3 do artigo
+    // Calcula o fatorDeRiquezaAbsoluta de cada participante
+    // Tempo de Fala / Total de tempo de fala = Sigma(f) 
+    //------------------------------------------------------- 
+    const totalTempoDeFalaEmSegundos = DataBaseForGauge.participantes.reduce(
+      (total, participante) => total + parseInt(participante.tempoDeFala.toString()), 0
+    );
+    console.log('==== 1. CalcularGini - totalTempoDeFalaEmSegundos = ', totalTempoDeFalaEmSegundos);
+
+    participantesFinal.forEach((participante, index) => {
+      participantesFinal[index].fatorRiquezaAbsoluta = participante.tempoDeFala / totalTempoDeFalaEmSegundos;
+    });
+    console.log('==== 2. CalcularGini - Lista de fatorRiquezaAbsoluta = ', participantesFinal);
+
+    //------------------------------------------------------- 
+    // COLUNA 5 do artigo
+    // Proporcao do tempo de presença de cada participante
+    // Total de tempo de fala = Sigma(f)
+    //------------------------------------------------------- 
+
+    const totalTempoDePresença = DataBaseForGauge.participantes.reduce((total, participante) => {
+      if (participante.tempoPresenca) {
+        return total += participante.tempoPresenca;
+      } else {
+        return total += participante.tempoDeFala;
+      }
+    }, 0);
+    
+    console.log('==== 3. CalcularGini - totalTempoPresenca = ', totalTempoDePresença);
+
+    participantesFinal.forEach((participante, index) => {
+      if (participante.fatorTempoPresenca){
+        participantesFinal[index].fatorTempoPresenca = participante.tempoPresenca / totalTempoDePresença;
+      } else {
+        participantesFinal[index].fatorTempoPresenca = participante.tempoPresenca / totalTempoDePresença;
+      }
+      console.log('==== 3.1. CalcularGini - FatorTempoPresenca = ', participantesFinal[index].fatorTempoPresenca );
+    });
+    console.log('==== 4. CalcularGini - Lista de fatorTempoPresenca = ', participantesFinal);
+
+    //------------------------------------------------------- 
+    // COLUNA 6 do artigo
+    // Proporcao de tempo de presenca ACUMULADA DA POPULACAO
+    //-------------------------------------------------------  
+
+    let fatorTempoPresencaAcumuladoAnterior = 0;
+
+    participantesFinal.forEach((participante, index) => {
+      participantesFinal[index].fatorAcumuladoPresenca = participante.fatorTempoPresenca + fatorTempoPresencaAcumuladoAnterior;
+      fatorTempoPresencaAcumuladoAnterior = participante.fatorAcumuladoPresenca;
+    });
+    console.log('==== 4. CalcularGini - fatorAcumiladoPresença = ', participantesFinal);
+
+    //------------------------------------------------------- 
+    // COLUNA 7 do artigo
+    // Acumulo da proporção dos tempos de fala
+    // Riqueza relativa acumulada - ponto da curva Lorenz
+    //-------------------------------------------------------  
+    let fatorAcumuladoLorenz = 0;
+
+    participantesFinal.forEach((participante, index) => {
+      participantesFinal[index].fatorAcumuladoCurvaLorenz = participante.fatorRiquezaAbsoluta + fatorAcumuladoLorenz;
+      fatorAcumuladoLorenz = participante.fatorAcumuladoCurvaLorenz;
+    });
+
+    console.log("==== 5. CalcularGini - Colecao de participantes com o calculo de Gini: ", participantesFinal);
+
 
     // Participantes ordenados de forma decrescente
-    const participantesOrdenados = DataBaseForGauge.participantes.slice().sort((a, b) => b.tempoDeFala - a.tempoDeFala);
-    console.log("==== 2. calcularGini() - Colecao de participantes: ", participantesOrdenados);
+    const participantesOrdenados = participantesFinal.slice().sort((a, b) => b.tempoDeFala - a.tempoDeFala);
+    console.log("Colecao de participantes: ", participantesOrdenados);
 
     /*
       Calcula a soma acumulativa dos tempos de fala dos participantes
     */
 
-    const ocupantesDaSala = DataBaseForGauge.participantes.length;
+    const ocupantesDaSala = participantesFinal.length;
     const somaAcumulativaTempo = participantesOrdenados.reduce((soma, participante) => {
       soma += participante.tempoDeFala;
       return soma;
     }, 0);
 
-    console.log("==== 3. calcularGini() - Soma dos tempos:", somaAcumulativaTempo);
-    console.log("==== 4. calcularGini() - Ocupantes da Sala:", ocupantesDaSala);
+    console.log("==== 6. CalcularGini -  Soma dos tempos : ", somaAcumulativaTempo);
+    console.log("==== 7. CalcularGini - Ocupantes da Sala:", ocupantesDaSala);
 
     /*
     Participantes ordenados de forma crescente
@@ -198,27 +267,30 @@ class DataBaseForGauge {
     participantesOrdenadosCrescente.pop();
 
     /*
-    Calculo Final do Gini e do participometro´ usando 1-formula
-    */
+    Calculo Final do Gini e do participometro usando 1-formula
+   */
     let fiAnterior = 0;
-    let index = 0;
     const ultimaPosicao = participantesOrdenadosCrescente.length - 1;
     let somatorioFi = 0;
     let ultimoElemento = 0;
-    participantesOrdenadosCrescente.forEach((participante) => {
-      somatorioFi += ((fiAnterior + participante.fatorAcumuladoCurvaLorenz) * participante.fatorTempoPresenca);
+
+    participantesOrdenadosCrescente.forEach((participante, index) => {
+      somatorioFi += (fiAnterior + participante.fatorAcumuladoCurvaLorenz) * participante.fatorTempoPresenca;
       fiAnterior = participante.fatorAcumuladoCurvaLorenz;
       if (index === ultimaPosicao) {
         ultimoElemento = participante.fatorAcumuladoPresenca;
       }
-      ++index;
     });
+
 
     /*
     Calculo final do Gini´ usando a formula do artigo
     */
+    console.log("==== 8. CalcularGini -  Soma AcumulativaTempo : ", somaAcumulativaTempo);
+    console.log("==== 9. CalcularGini - ultimo Elemento:", ultimoElemento);
+
     const giniIndex = (somatorioFi / (ultimoElemento ** 2));
-    console.log("==== 5. calcularGini() - resultado de giniIndex:", giniIndex);
+    console.log("==== 10. CalcularGini - Valor Final de Gini:", giniIndex);
 
     return giniIndex;
   }
@@ -260,6 +332,8 @@ class DataBaseForGauge {
             participante.name = partic.name ?? participante.name;
             participante.role = partic.role ?? participante.role;
             participante.dominantSpeaker = partic.dominantSpeaker ?? participante.dominantSpeaker;
+            participante.fatorTempoPresenca = participante.tempoDeFala;
+            participante.fatorAcumuladoCurvaLorenz = 0;
             console.log(`==== 6. processarParticipante  --> participante montado ${key}: `, participante);
             DataBaseForGauge.participantes.push(participante);
             break;
