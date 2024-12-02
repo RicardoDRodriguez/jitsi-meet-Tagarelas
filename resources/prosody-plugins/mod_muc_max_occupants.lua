@@ -68,5 +68,5 @@ local function check_for_max_occupants(event)
 end
 
 if MAX_OCCUPANTS > 0 then
-	module:hook("muc-occupant-pre-join", check_for_max_occupants, 10);
+	module:hook("muc-occupant-pre-join", check_for_max_occupants, 20);
 end

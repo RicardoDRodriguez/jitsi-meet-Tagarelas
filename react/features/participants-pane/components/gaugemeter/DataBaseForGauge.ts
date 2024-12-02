@@ -3,8 +3,9 @@ import Participante from "./Participante";
 import { IReduxState } from "../../../app/types";
 import { getParticipantById } from "../../../base/participants/functions";
 import { IParticipant } from "../../../base/participants/types";
-import { getRoomName } from "../../../base/conference/functions";
+import { getAnalyticsRoomName, getRoomName } from "../../../base/conference/functions";
 import { getSortedParticipantIds } from "../../functions";
+import moment from 'moment';
 
 
 class DataBaseForGauge {
@@ -13,10 +14,13 @@ class DataBaseForGauge {
   static state: IReduxState;
   static room: string = '';
   static conference: any;
+  static roomStarted: number;
+   
 
 
   async clearData(): Promise<void> {
     DataBaseForGauge.participantes = [];
+    console.log("==== 0 = clearData -> roomStarted: ", DataBaseForGauge.roomStarted);
   }
 
   async percorrerParticipantes(): Promise<void> {
@@ -193,22 +197,19 @@ class DataBaseForGauge {
     //------------------------------------------------------- 
 
     const totalTempoDePresença = DataBaseForGauge.participantes.reduce((total, participante) => {
-      if (participante.tempoPresenca) {
-        return total += participante.tempoPresenca;
-      } else {
-        return total += participante.tempoDeFala;
-      }
+      return total + participante.tempoPresenca;
     }, 0);
     
+
     console.log('==== 3. CalcularGini - totalTempoPresenca = ', totalTempoDePresença);
 
     participantesFinal.forEach((participante, index) => {
-      if (participante.fatorTempoPresenca){
+      if (participante.fatorTempoPresenca) {
         participantesFinal[index].fatorTempoPresenca = participante.tempoPresenca / totalTempoDePresença;
       } else {
         participantesFinal[index].fatorTempoPresenca = participante.tempoPresenca / totalTempoDePresença;
       }
-      console.log('==== 3.1. CalcularGini - FatorTempoPresenca = ', participantesFinal[index].fatorTempoPresenca );
+      console.log('==== 3.1. CalcularGini - FatorTempoPresenca = ', participantesFinal[index].fatorTempoPresenca);
     });
     console.log('==== 4. CalcularGini - Lista de fatorTempoPresenca = ', participantesFinal);
 
@@ -320,19 +321,22 @@ class DataBaseForGauge {
 
       if (partic) {
         const speakerStats = DataBaseForGauge.conference.getSpeakerStats();
+        const now = new Date().getTime()
         for (const userId in speakerStats) {
           if (userId === key) {
             console.log(`==== 4. processarParticipante --> encontrei em SpeakerStats ${key}: `, speakerStats);
             const stats = speakerStats[userId];
             console.log(`==== 5. processarParticipante  --> encontrei em stats ${key}: `, stats);
             participante.tempoDeFala = stats.getTotalDominantSpeakerTime() ?? participante.tempoDeFala;
-            participante.entradaNaSala = stats._dominantSpeakerStart ?? participante.entradaNaSala;
+            participante.entradaNaSala = DataBaseForGauge.roomStarted ?? participante.entradaNaSala;
+            participante.tempoPresenca = now - DataBaseForGauge.roomStarted;
             participante.avatarURL = partic.avatarURL ?? participante.avatarURL;
             participante.displayName = partic.displayName ?? participante.displayName;
             participante.name = partic.name ?? participante.name;
             participante.role = partic.role ?? participante.role;
             participante.dominantSpeaker = partic.dominantSpeaker ?? participante.dominantSpeaker;
-            participante.fatorTempoPresenca = participante.tempoDeFala;
+            participante.fatorTempoPresenca = 0;
+            console.log(`==== 5.1. processarParticipante  --> participante ${key}, participante.fatorDePresença ${participante.fatorTempoPresenca}: `);
             participante.fatorAcumuladoCurvaLorenz = 0;
             console.log(`==== 6. processarParticipante  --> participante montado ${key}: `, participante);
             DataBaseForGauge.participantes.push(participante);

@@ -164,6 +164,7 @@ import { AudioMixerEffect } from './react/features/stream-effects/audio-mixer/Au
 import { createRnnoiseProcessor } from './react/features/stream-effects/rnnoise';
 import { handleToggleVideoMuted } from './react/features/toolbox/actions.any';
 import { muteLocal } from './react/features/video-menu/actions.any';
+import DataBaseForGauge from './react/features/participants-pane/components/gaugemeter/DataBaseForGauge';
 
 const logger = Logger.getLogger(__filename);
 let room;
@@ -253,7 +254,7 @@ class ConferenceConnector {
         this._reject = reject;
         this.reconnectTimeout = null;
         room.on(JitsiConferenceEvents.CONFERENCE_JOINED,
-            this._handleConferenceJoined.bind(this));
+            this._handleConferenceJoined.bind(this), DataBaseForGauge.roomStarted = new Date().getTime());
         room.on(JitsiConferenceEvents.CONFERENCE_FAILED,
             this._onConferenceFailed.bind(this));
     }

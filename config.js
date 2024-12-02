@@ -252,7 +252,7 @@ var config = {
     //     disableRemoveRaisedHandOnFocus: false,
     // },
 
-    // speakerStats: {
+    //  {
     //     // Specifies whether the speaker stats is enable or not.
     //     disabled: false,
 
@@ -604,14 +604,14 @@ var config = {
     //    // The recording limit in minutes. Note: This number appears in the notification text
     //    // but doesn't enforce the actual recording time limit. This should be configured in
     //    // jibri!
-    //    limit: 60,
+    //    limit: 160,
     //
     //    // The name of the app with unlimited recordings.
     //    appName: 'Unlimited recordings APP',
     //
     //    // The URL of the app with unlimited recordings.
     //    appURL: 'https://unlimited.recordings.app.com/',
-    // },
+   //  },
 
     // Disables or enables RTX (RFC 4588) (defaults to false).
     // disableRtx: false,
