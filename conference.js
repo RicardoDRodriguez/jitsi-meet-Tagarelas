@@ -166,6 +166,7 @@ import { handleToggleVideoMuted } from './react/features/toolbox/actions.any';
 import { muteLocal } from './react/features/video-menu/actions.any';
 import DataBaseForGauge from './react/features/participants-pane/components/gaugemeter/DataBaseForGauge';
 
+
 const logger = Logger.getLogger(__filename);
 let room;
 
@@ -254,7 +255,7 @@ class ConferenceConnector {
         this._reject = reject;
         this.reconnectTimeout = null;
         room.on(JitsiConferenceEvents.CONFERENCE_JOINED,
-            this._handleConferenceJoined.bind(this), DataBaseForGauge.roomStarted = new Date().getTime());
+            this._handleConferenceJoined.bind(this));
         room.on(JitsiConferenceEvents.CONFERENCE_FAILED,
             this._onConferenceFailed.bind(this));
     }
@@ -360,7 +361,8 @@ class ConferenceConnector {
      */
     connect() {
         const replaceParticipant = getReplaceParticipant(APP.store.getState());
-
+        
+        DataBaseForGauge.roomStarted = new Date().getTime();
         // the local storage overrides here and in connection.js can be used by jibri
         room.join(jitsiLocalStorage.getItem('xmpp_conference_password_override'), replaceParticipant);
     }
